@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -41,7 +41,7 @@ jobs:
        APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
      steps:
        - name: Checkout
-         uses: actions/checkout@v2
+         uses: actions/checkout@v3
        - name: Setup PHP
          uses: shivammathur/setup-php@v2
          with:
@@ -54,7 +54,7 @@ jobs:
          id: composercache
          run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
        - name: Cache dependencies
-         uses: actions/cache@v2
+         uses: actions/cache@v3
          with:
            path: ${{ steps.composercache.outputs.dir }}
            key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -62,7 +62,7 @@ jobs:
        - name: Update project dependencies
          run: composer update --no-interaction --no-progress --ansi
        - name: Cache PHPStan results
-         uses: actions/cache@v2
+         uses: actions/cache@v3
          with:
            path: /tmp/phpstan
            key: phpstan-php${{ matrix.php }}-${{ github.sha }}
@@ -84,7 +84,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -97,7 +97,7 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -115,16 +115,15 @@ jobs:
           - '8.1'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
-      - uses: nanasess/setup-chromedriver@v1
-      - name: Fix Java version # Use JDK8 due to https://github.com/SeleniumHQ/selenium/issues/4964
-        run: |
-          sudo apt-get install openjdk-8-jre
-          sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+      - uses: actions/checkout@v3
+#      - name: Fix Java version # Use JDK8 due to https://github.com/SeleniumHQ/selenium/issues/4964
+#        run: |
+#          sudo apt-get install openjdk-8-jre
+#          sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
       - name: Setup
         run: |
           export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
+          chromedriver --log-path=./chromedriver.log --log-level=ALL --url-base=/wd/hub &
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -138,20 +137,28 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Run selenium
-        run: |
-          wget "https://selenium-release.storage.googleapis.com/3.9/selenium-server-standalone-3.9.1.jar" -O selenium.jar
-          java -jar selenium.jar &> /dev/null &
-      - name: Run php fixtures server
-        run: php -S localhost:8080 -t tests/fixtures/www &> /dev/null &
+#      - name: Run selenium
+#        run: |
+#          wget "https://selenium-release.storage.googleapis.com/3.12/selenium-server-standalone-3.12.0.jar" -O selenium.jar
+#          java -jar selenium.jar > ./selenium.log 2>&1 &
+#      - name: Run php fixtures server
+#        run: php -S localhost:8080 -t tests/fixtures/www &> /dev/null &
+#      - name: Sleep
+#        run: sleep 5
       - name: Run behat tests (default)
         run: ./bin/behat -fprogress --tags="~@user" --no-interaction --profile=default
       - name: Run behat tests (symfony 2)
         run: ./bin/behat -fprogress --tags="~@user" --no-interaction --profile=symfony2
+      - name: Archive logs
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: logs
+          path: "*.log"
