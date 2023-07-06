@@ -38,6 +38,10 @@ class HttpCallListener implements EventSubscriberInterface
             return;
         }
 
+        if ($testResult->getException()) {
+            return;
+        }
+
         $httpCallResult = new HttpCallResult(
             $testResult->getCallResult()->getReturn()
         );
