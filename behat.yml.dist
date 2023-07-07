@@ -18,27 +18,40 @@ default:
             filters:
                 tags: '~@user'
     extensions:
+        Robertfausk\Behat\PantherExtension: ~
         Behat\MinkExtension:
             base_url: 'http://localhost:8080'
             files_path: '%paths.base%/tests/fixtures/files'
             sessions:
                 default:
                     goutte: ~
+#                symfony2:
+#                    selenium2:
+#                        browser: 'chrome'
+#                        capabilities:
+#                            browser: 'chrome'
+#                            browserName: 'chrome'
+#                            chrome:
+#                                switches:
+#                                    - '--headless'
+#                                    - '--disable-gpu'
+#                                    - '--disable-dev-shm-usage'
+#                                    - '--no-sandbox'
+#                            extra_capabilities:
+#                                "goog:chromeOptions":
+#                                    w3c: false
                 symfony2:
-                    selenium2:
-                        browser: 'chrome'
-                        capabilities:
+                    panther:
+                        options:
                             browser: 'chrome'
-                            browserName: 'chrome'
-                            chrome:
-                                switches:
-                                    - '--headless'
-                                    - '--disable-gpu'
-                                    - '--disable-dev-shm-usage'
-                                    - '--no-sandbox'
-                            extra_capabilities:
-                                "goog:chromeOptions":
-                                    w3c: false
+                            webServerDir: '%paths.base%/tests/fixtures/files'
+                        manager_options:
+                            chromedriver_arguments:
+                                - '--headless'
+                                - '--disable-gpu'
+                                - '--disable-dev-shm-usage'
+                                - '--no-sandbox'
+
         Behatch\Extension: ~
 
 symfony2:

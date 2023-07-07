@@ -7,7 +7,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Exception\ResponseTextException;
-use WebDriver\Exception\StaleElementReference;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 class BrowserContext extends BaseContext
 {
@@ -209,7 +209,7 @@ class BrowserContext extends BaseContext
                 return;
             } catch (ExpectationException $e) {
                 /* Intentionally leave blank */
-            } catch (StaleElementReference $e) {
+            } catch (StaleElementReferenceException $e) {
                 // assume page reloaded whilst we were still waiting
             }
         } while (time() - $startTime < $count);
