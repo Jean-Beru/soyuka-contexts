@@ -146,7 +146,7 @@ jobs:
       - name: Run Selenium
         run: |
           wget "https://selenium-release.storage.googleapis.com/3.9/selenium-server-standalone-3.9.1.jar" -O selenium.jar
-          java -jar selenium.jar -debug &> /dev/null &
+          java -jar selenium.jar &> /dev/null &
       - name: Run PHP fixtures server
         run: php -S localhost:8080 -t tests/fixtures/www &> /dev/null &
       - name: Get composer cache directory
@@ -166,4 +166,4 @@ jobs:
           while ! nc -z localhost 8080 </dev/null; do echo Waiting for PHP server to start...; sleep 1; done
         timeout-minutes: 1
       - name: Run behat tests
-        run: ./bin/behat -fprogress --no-interaction --profile=${{ matrix.profile }}
+        run: ./bin/behat --no-interaction --profile=${{ matrix.profile }} -vvv
