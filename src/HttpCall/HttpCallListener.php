@@ -35,7 +35,7 @@ class HttpCallListener implements EventSubscriberInterface
         $testResult = $event->getTestResult();
 
         if (!$testResult instanceof ExecutedStepResult) {
-            return;
+            return true;
         }
 
         $httpCallResult = new HttpCallResult(
@@ -45,11 +45,6 @@ class HttpCallListener implements EventSubscriberInterface
         if ($this->contextSupportedVoter->vote($httpCallResult)) {
             $this->httpCallResultPool->store($httpCallResult);
 
-            return true;
-        }
-
-        // Session can be stopped. Ex: using SystemContext
-        if (!$this->mink->getSession()->isStarted()) {
             return;
         }
 
@@ -63,6 +58,8 @@ class HttpCallListener implements EventSubscriberInterface
             // Mink has no response
         } catch (\Behat\Mink\Exception\DriverException $e) {
             // No Mink
+        } catch (\WebDriver\Exception\NoSuchDriver $e) {
+            // A session is either terminated or not started
         }
     }
 }
