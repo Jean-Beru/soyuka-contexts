@@ -15,7 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
- * Only runs when the optional packages are removed (see the CI "missing dependencies" job).
+ * Excluded by default: run with `--group missing-dependencies` once the optional packages
+ * are removed (see the CI "without optional dependencies" job).
  */
 #[Group('missing-dependencies')]
 final class MissingDependencyTest extends TestCase

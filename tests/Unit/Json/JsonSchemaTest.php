@@ -21,7 +21,9 @@ final class JsonSchemaTest extends TestCase
     {
         $file = 'file://'.__DIR__.'/../../fixtures/files/schema.json';
 
-        $this->assertEquals((object) ['$id' => $file], (new SchemaStorage())->resolveRef($file));
+        $schema = (new JsonSchema('{}', $file))->resolve(new SchemaStorage());
+
+        $this->assertEquals((object) ['$id' => $file], $schema->getContent());
     }
 
     public function testValidate(): void

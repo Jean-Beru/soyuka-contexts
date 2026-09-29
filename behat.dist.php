@@ -10,6 +10,9 @@ use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behatch\Tests\Behat\MinkTranslationContext;
 use Robertfausk\Behat\PantherExtension\ServiceContainer\PantherExtension;
 
+// URL of the fixtures server (php -S localhost:8080 -t tests/fixtures/www)
+$baseUrl = getenv('BEHAT_BASE_URL') ?: 'http://localhost:8080';
+
 return (new Config())
     ->withProfile((new Profile('default'))
         ->withSuite((new Suite('default'))
@@ -25,7 +28,7 @@ return (new Config())
             ->withFilter(new TagFilter('~@user')))
         ->withExtension(new Extension(PantherExtension::class))
         ->withExtension(new Extension(MinkExtension::class, [
-            'base_url' => 'http://localhost:8080',
+            'base_url' => $baseUrl,
             'files_path' => '%paths.base%/tests/fixtures/files',
             'default_session' => 'default',
             'javascript_session' => 'javascript',
@@ -37,10 +40,18 @@ return (new Config())
                     'panther' => [
                         'options' => [
                             'browser' => 'chrome',
-                            'external_base_uri' => 'http://localhost:8080',
+                            'external_base_uri' => $baseUrl,
                         ],
                     ],
                 ],
             ],
         ]))
-        ->withExtension(new Extension(Behatch\Extension::class)));
+        ->withExtension(new Extension(Behatch\Extension::class)))
+    // Runs every scenario in the real browser, except those needing response headers,
+    // status codes or raw bodies that Panther cannot provide
+    ->withProfile((new Profile('panther'))
+        ->withSuite((new Suite('default'))
+            ->withFilter(new TagFilter('~@user&&~@statusCode&&~@rest&&~@json&&~@xml')))
+        ->withExtension(new Extension(MinkExtension::class, [
+            'default_session' => 'javascript',
+        ])));
