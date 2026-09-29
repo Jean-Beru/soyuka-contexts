@@ -10,6 +10,8 @@ trait Asserter
     {
         try {
             $callbable();
+        } catch (MissingDependencyException $e) {
+            throw $e;
         } catch (\Exception $e) {
             return;
         }
