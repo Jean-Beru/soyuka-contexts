@@ -2,7 +2,11 @@
 
 namespace Behatch\HttpCall\Request;
 
+use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Mink;
+use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
 class BrowserKit
 {
@@ -39,7 +43,7 @@ class BrowserKit
 
     protected function getRequest()
     {
-        return $this->mink->getSession()->getDriver()->getClient()->getInternalRequest();
+        return $this->getClient()->getInternalRequest();
     }
 
     public function getContent()
@@ -49,13 +53,16 @@ class BrowserKit
 
     public function send($method, $url, $parameters = [], $files = [], ?string $content = null, $headers = [])
     {
-        foreach ($files as $originalName => &$file) {
+        $client = $this->getClient();
+
+        foreach ($files as &$file) {
             if (\is_string($file)) {
-                $file = ['tmp_name' => $file, 'name' => (string) $originalName];
+                // HttpKernelBrowser only keeps UploadedFile instances, HttpBrowser only reads arrays
+                $file = $client instanceof HttpKernelBrowser
+                    ? new UploadedFile($file, basename($file), null, null, true)
+                    : ['tmp_name' => $file, 'name' => basename($file)];
             }
         }
-
-        $client = $this->mink->getSession()->getDriver()->getClient();
 
         $client->followRedirects(false);
 
@@ -83,7 +90,7 @@ class BrowserKit
         }
         /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
 
-        $this->mink->getSession()->getDriver()->getClient()->setServerParameter($name, $value);
+        $this->getClient()->setServerParameter($name, $value);
     }
 
     public function getHttpHeaders()
@@ -120,6 +127,17 @@ class BrowserKit
 
     protected function resetHttpHeaders(): void
     {
-        $this->mink->getSession()->getDriver()->getClient()->setServerParameters([]);
+        $this->getClient()->setServerParameters([]);
+    }
+
+    private function getClient(): AbstractBrowser
+    {
+        $driver = $this->mink->getSession()->getDriver();
+
+        if (!$driver instanceof BrowserKitDriver) {
+            throw new \LogicException(\sprintf('Sending HTTP requests needs a BrowserKit Mink session such as "browserkit_http", the current session uses "%s".', $driver::class));
+        }
+
+        return $driver->getClient();
     }
 }
