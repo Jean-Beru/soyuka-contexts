@@ -6,3 +6,5 @@ composer.lock
 composer.phar
 vendor
 .php-cs-fixer.cache
+/index.png
+/fail_*.png
