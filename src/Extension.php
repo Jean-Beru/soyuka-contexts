@@ -7,12 +7,15 @@ use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class Extension implements ExtensionInterface
 {
+    use PriorityTaggedServiceTrait;
+
     public function getConfigKey(): string
     {
         return 'behatch';
@@ -48,17 +51,11 @@ class Extension implements ExtensionInterface
 
     private function loadHttpCallListener(ContainerBuilder $container): void
     {
-        $processor = new \Behat\Testwork\ServiceContainer\ServiceProcessor();
-        $references = $processor->findAndSortTaggedServices($container, 'behatch.context_voter');
+        $references = $this->findAndSortTaggedServices('behatch.context_voter', $container);
         $definition = $container->getDefinition('behatch.context_supported.voter');
 
         foreach ($references as $reference) {
             $definition->addMethodCall('register', [$reference]);
         }
-    }
-
-    public function getCompilerPasses()
-    {
-        return [];
     }
 }
