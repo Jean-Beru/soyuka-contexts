@@ -21,9 +21,9 @@ class SystemContext implements Context
         $this->root = $root;
     }
 
-    public static function getTranslationResources()
+    public static function getTranslationResources(): array
     {
-        return glob(__DIR__.'/../../i18n/*.xliff');
+        return glob(__DIR__.'/../../i18n/*.xliff') ?: [];
     }
 
     /**
