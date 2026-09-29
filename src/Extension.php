@@ -27,6 +27,11 @@ class Extension implements ExtensionInterface
 
     public function process(ContainerBuilder $container): void
     {
+        if (!$container->has('mink')) {
+            throw new \LogicException(\sprintf('The "%s" extension needs the Mink extension: register "new Extension(%s::class, [...])" in your behat.php.', self::class, 'Behat\MinkExtension\ServiceContainer\MinkExtension'));
+        }
+
+        $this->loadHttpCallListener($container);
     }
 
     public function load(ContainerBuilder $container, array $config): void
@@ -35,7 +40,6 @@ class Extension implements ExtensionInterface
         $loader->load('http_call.yml');
 
         $this->loadClassResolver($container);
-        $this->loadHttpCallListener($container);
     }
 
     public function configure(ArrayNodeDefinition $builder): void
