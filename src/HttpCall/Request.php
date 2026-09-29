@@ -46,14 +46,6 @@ class Request
      */
     private function getClient()
     {
-        if (null === $this->client) {
-            if ('symfony2' === $this->mink->getDefaultSessionName()) {
-                $this->client = new Request\Goutte($this->mink);
-            } else {
-                $this->client = new Request\BrowserKit($this->mink);
-            }
-        }
-
-        return $this->client;
+        return $this->client ??= new Request\BrowserKit($this->mink);
     }
 }
