@@ -122,15 +122,6 @@ class RestContext extends BaseContext
         }
     }
 
-    public function theHeaderShouldBeContains($name, $value): void
-    {
-        @trigger_error(
-            \sprintf('The %s function is deprecated since version 3.1 and will be removed in 4.0. Use the %s::theHeaderShouldContain function instead.', __METHOD__, __CLASS__),
-            \E_USER_DEPRECATED
-        );
-        $this->theHeaderShouldContain($name, $value);
-    }
-
     /**
      * Checks, whether the header name contains the given text.
      */

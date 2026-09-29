@@ -168,7 +168,6 @@ class SystemContext implements Context
     }
 
     #[Given('(I )create the file :filename containing:')]
-    #[Given('(I )create the file :filename contening:')]
     public function iCreateTheFileContaining($filename, PyStringNode $string): void
     {
         if (!is_file($filename)) {
