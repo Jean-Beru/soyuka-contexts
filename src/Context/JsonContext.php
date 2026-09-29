@@ -190,7 +190,7 @@ class JsonContext extends BaseContext
      * Checks, that given JSON node has N element(s).
      */
     #[Then('the JSON node :node should have :count element(s)')]
-    public function theJsonNodeShouldHaveElements($node, int $count): void
+    public function theJsonNodeShouldHaveElements($node, $count): void
     {
         $json = $this->getJson();
 
