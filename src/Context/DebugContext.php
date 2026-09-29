@@ -5,6 +5,7 @@ namespace Behatch\Context;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Gherkin\Node\StepNode;
 use Behat\Hook\AfterStep;
+use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Step\Then;
 use Behat\Step\When;
@@ -63,7 +64,11 @@ class DebugContext extends BaseContext
         }
 
         $filename = \sprintf('fail_%s_%s_%s_%s.png', time(), $suiteName, $featureName, $scenarioName);
-        $this->saveScreenshot($filename, $this->screenshotDir);
+        try {
+            $this->saveScreenshot($filename, $this->screenshotDir);
+        } catch (DriverException $e) {
+            // keep the step failure, not the screenshot error
+        }
     }
 
     private function displayProfilerLink(): void

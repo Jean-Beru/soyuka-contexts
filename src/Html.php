@@ -6,7 +6,7 @@ use Behat\Mink\Session;
 
 trait Html
 {
-    abstract public function getSession(?string $name = null): Session;
+    abstract protected function getSession(?string $name = null): Session;
 
     protected function countElements($element, $index, $parent)
     {
