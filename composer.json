@@ -17,8 +17,6 @@
     },
 
     "require-dev": {
-        "atoum/atoum": "^4.0",
-        "atoum/stubs": "^2.6",
         "behat/mink-browserkit-driver": "^2.3",
         "justinrainbow/json-schema": "^6.0",
         "phpunit/phpunit": "^12.5",
