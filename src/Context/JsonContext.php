@@ -9,6 +9,7 @@ use Behatch\HttpCall\HttpCallResultPool;
 use Behatch\Json\Json;
 use Behatch\Json\JsonInspector;
 use Behatch\Json\JsonSchema;
+use Behatch\MissingDependencyException;
 
 class JsonContext extends BaseContext
 {
@@ -257,6 +258,8 @@ class JsonContext extends BaseContext
 
         try {
             $node = $this->inspector->evaluate($json, $name);
+        } catch (MissingDependencyException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception("The node '$name' does not exist.");
         }
