@@ -1,5 +1,5 @@
 atoum.xunit.xml
-behat.yml
+behat.php
 behatch_contexts.phar
 bin/
 composer.lock
