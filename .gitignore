@@ -1,4 +1,4 @@
-atoum.xunit.xml
+.phpunit.cache
 behat.php
 behatch_contexts.phar
 bin/
