@@ -29,7 +29,8 @@ class JsonSchema extends Json
 
     public function validate(Json $json, Validator $validator)
     {
-        $validator->check($json->getContent(), $this->getContent());
+        $content = $json->getContent();
+        $validator->validate($content, $this->getContent());
 
         if (!$validator->isValid()) {
             $msg = 'JSON does not validate. Violations:'.\PHP_EOL;
