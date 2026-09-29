@@ -15,8 +15,8 @@ final class MinkTranslationContext implements TranslatableContext
     public static function getTranslationResources(): array
     {
         $dir = sys_get_temp_dir().'/behatch-mink-i18n';
-        if (!is_dir($dir)) {
-            mkdir($dir);
+        if (!is_dir($dir) && !@mkdir($dir) && !is_dir($dir)) {
+            throw new \RuntimeException(\sprintf('Unable to create the "%s" directory.', $dir));
         }
 
         $resources = [];

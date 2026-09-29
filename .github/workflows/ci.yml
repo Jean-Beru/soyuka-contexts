@@ -129,11 +129,17 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Run tests
-        run: ./bin/phpunit --group missing-dependencies
+        run: ./bin/phpunit --group missing-dependencies --fail-on-skipped
 
   behat:
-    name: Behat
+    name: Behat (${{ matrix.profile }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        profile:
+          - 'default'
+          - 'panther'
+      fail-fast: false
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
@@ -165,4 +171,4 @@ jobs:
           while ! nc -z localhost 8080 </dev/null; do echo Waiting for PHP server to start...; sleep 1; done
         timeout-minutes: 1
       - name: Run behat tests
-        run: ./bin/behat -fprogress --no-interaction --strict
+        run: ./bin/behat -fprogress --no-interaction --strict --profile=${{ matrix.profile }}
