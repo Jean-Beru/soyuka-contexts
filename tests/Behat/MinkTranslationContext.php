@@ -22,7 +22,10 @@ final class MinkTranslationContext implements TranslatableContext
         $resources = [];
         foreach (MinkContext::getMinkTranslationResources() as $resource) {
             $resources[] = $target = $dir.'/'.basename($resource);
-            file_put_contents($target, str_replace('\\\\"', '\\"', file_get_contents($resource)));
+            // write then rename, so that a concurrent run never reads a partial file
+            $tmp = tempnam($dir, 'xliff');
+            file_put_contents($tmp, str_replace('\\\\"', '\\"', file_get_contents($resource)));
+            rename($tmp, $target);
         }
 
         return $resources;
