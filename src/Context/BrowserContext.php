@@ -17,11 +17,11 @@ use WebDriver\Exception\StaleElementReference;
 
 class BrowserContext extends BaseContext
 {
-    private $timeout;
-    private $dateFormat = 'dmYHi';
-    private $timerStartedAt;
+    private readonly float $timeout;
+    private string $dateFormat = 'dmYHi';
+    private int $timerStartedAt;
 
-    public function __construct($timeout = 1)
+    public function __construct(float $timeout = 1)
     {
         $this->timeout = $timeout;
     }
@@ -45,7 +45,7 @@ class BrowserContext extends BaseContext
      * Set login / password for next HTTP authentication.
      */
     #[When('(I )set basic authentication with :user and :password')]
-    public function iSetBasicAuthenticationWithAnd($user, $password): void
+    public function iSetBasicAuthenticationWithAnd(string $user, string $password): void
     {
         $this->getSession()->setBasicAuth($user, $password);
     }
@@ -54,14 +54,14 @@ class BrowserContext extends BaseContext
      * Open url with various parameters.
      */
     #[Given('(I )am on url composed by:')]
-    public function iAmOnUrlComposedBy(TableNode $tableNode)
+    public function iAmOnUrlComposedBy(TableNode $tableNode): void
     {
         $url = '';
         foreach ($tableNode->getHash() as $hash) {
             $url .= $hash['parameters'];
         }
 
-        return $this->getMinkContext()
+        $this->getMinkContext()
             ->visit($url);
     }
 
@@ -69,7 +69,7 @@ class BrowserContext extends BaseContext
      * Clicks on the nth CSS element.
      */
     #[When('(I )click on the :index :element element')]
-    public function iClickOnTheNthElement($index, $element): void
+    public function iClickOnTheNthElement(int $index, string $element): void
     {
         $node = $this->findElement('css', $element, $index);
         $node->click();
@@ -79,7 +79,7 @@ class BrowserContext extends BaseContext
      * Click on the nth specified link.
      */
     #[When('(I )follow the :index :link link')]
-    public function iFollowTheNthLink($index, $link): void
+    public function iFollowTheNthLink(int $index, string $link): void
     {
         $node = $this->findElement('named', ['link', $link], $index);
         $node->click();
@@ -89,7 +89,7 @@ class BrowserContext extends BaseContext
      * Presses the nth specified button.
      */
     #[When('(I )press the :index :button button')]
-    public function pressTheNthButton($index, $button): void
+    public function pressTheNthButton(int $index, string $button): void
     {
         $node = $this->findElement('named', ['button', $button], $index);
         $node->click();
@@ -99,18 +99,18 @@ class BrowserContext extends BaseContext
      * Fills in form field with current date.
      */
     #[When('(I )fill in :field with the current date')]
-    public function iFillInWithTheCurrentDate($field)
+    public function iFillInWithTheCurrentDate(string $field): void
     {
-        return $this->iFillInWithTheCurrentDateAndModifier($field, 'now');
+        $this->iFillInWithTheCurrentDateAndModifier($field, 'now');
     }
 
     /**
      * Fills in form field with current date and strtotime modifier.
      */
     #[When('(I )fill in :field with the current date and modifier :modifier')]
-    public function iFillInWithTheCurrentDateAndModifier($field, $modifier)
+    public function iFillInWithTheCurrentDateAndModifier(string $field, string $modifier): void
     {
-        return $this->getMinkContext()
+        $this->getMinkContext()
             ->fillField($field, date($this->dateFormat, strtotime($modifier)));
     }
 
@@ -118,7 +118,7 @@ class BrowserContext extends BaseContext
      * Mouse over a CSS element.
      */
     #[When('(I )hover :element')]
-    public function iHoverIShouldSeeIn($element): void
+    public function iHoverIShouldSeeIn(string $element): void
     {
         $node = $this->getSession()->getPage()->find('css', $element);
         if (null === $node) {
@@ -131,7 +131,7 @@ class BrowserContext extends BaseContext
      * Save value of the field in parameters array.
      */
     #[When('(I )save the value of :field in the :parameter parameter')]
-    public function iSaveTheValueOfInTheParameter($field, $parameter): void
+    public function iSaveTheValueOfInTheParameter(string $field, string $parameter): void
     {
         $field = str_replace('\\"', '"', $field);
         $node = $this->getSession()->getPage()->findField($field);
@@ -146,7 +146,7 @@ class BrowserContext extends BaseContext
      * Checks, that the page should contains specified text after given timeout.
      */
     #[Then('(I )wait :count second(s) until I see :text')]
-    public function iWaitSecondsUntilISee($count, $text): void
+    public function iWaitSecondsUntilISee(float $count, string $text): void
     {
         $this->iWaitSecondsUntilISeeInTheElement($count, $text, 'html');
     }
@@ -155,7 +155,7 @@ class BrowserContext extends BaseContext
      * Checks, that the page should not contain specified text before given timeout.
      */
     #[Then('(I )should not see :text within :count second(s)')]
-    public function iDontSeeInSeconds($count, $text): void
+    public function iDontSeeInSeconds(float $count, string $text): void
     {
         $caught = false;
         try {
@@ -171,7 +171,7 @@ class BrowserContext extends BaseContext
      * Checks, that the page should contains specified text after timeout.
      */
     #[Then('(I )wait until I see :text')]
-    public function iWaitUntilISee($text): void
+    public function iWaitUntilISee(string $text): void
     {
         $this->iWaitSecondsUntilISee($this->timeout, $text);
     }
@@ -180,7 +180,7 @@ class BrowserContext extends BaseContext
      * Checks, that the element contains specified text after timeout.
      */
     #[Then('(I )wait :count second(s) until I see :text in the :element element')]
-    public function iWaitSecondsUntilISeeInTheElement($count, $text, $element): void
+    public function iWaitSecondsUntilISeeInTheElement(float $count, string $text, string $element): void
     {
         $startTime = time();
         $this->iWaitSecondsForElement($count, $element);
@@ -208,7 +208,7 @@ class BrowserContext extends BaseContext
     }
 
     #[Then('(I )wait :count second(s)')]
-    public function iWaitSeconds($count): void
+    public function iWaitSeconds(float $count): void
     {
         usleep((int) ($count * 1000000));
     }
@@ -217,7 +217,7 @@ class BrowserContext extends BaseContext
      * Checks, that the element contains specified text after timeout.
      */
     #[Then('(I )wait until I see :text in the :element element')]
-    public function iWaitUntilISeeInTheElement($text, $element): void
+    public function iWaitUntilISeeInTheElement(string $text, string $element): void
     {
         $this->iWaitSecondsUntilISeeInTheElement($this->timeout, $text, $element);
     }
@@ -226,7 +226,7 @@ class BrowserContext extends BaseContext
      * Checks, that the page should contains specified element after timeout.
      */
     #[Then('(I )wait for :element element')]
-    public function iWaitForElement($element): void
+    public function iWaitForElement(string $element): void
     {
         $this->iWaitSecondsForElement($this->timeout, $element);
     }
@@ -235,7 +235,7 @@ class BrowserContext extends BaseContext
      * Wait for a element.
      */
     #[Then('(I )wait :count second(s) for :element element')]
-    public function iWaitSecondsForElement($count, $element): void
+    public function iWaitSecondsForElement(float $count, string $element): void
     {
         $found = false;
         $startTime = time();
@@ -259,7 +259,7 @@ class BrowserContext extends BaseContext
     }
 
     #[Then('/^(?:|I )should see (?P<count>\d+) "(?P<element>[^"]*)" in the (?P<index>\d+)(?:st|nd|rd|th) "(?P<parent>[^"]*)"$/')]
-    public function iShouldSeeNElementInTheNthParent($count, $element, $index, $parent): void
+    public function iShouldSeeNElementInTheNthParent(int $count, string $element, int $index, string $parent): void
     {
         $actual = $this->countElements($element, $index, $parent);
         if ($actual !== $count) {
@@ -268,7 +268,7 @@ class BrowserContext extends BaseContext
     }
 
     #[Then('(I )should see less than :count :element in the :index :parent')]
-    public function iShouldSeeLessThanNElementInTheNthParent($count, $element, $index, $parent): void
+    public function iShouldSeeLessThanNElementInTheNthParent(int $count, string $element, int $index, string $parent): void
     {
         $actual = $this->countElements($element, $index, $parent);
         if ($actual > $count) {
@@ -277,7 +277,7 @@ class BrowserContext extends BaseContext
     }
 
     #[Then('(I )should see more than :count :element in the :index :parent')]
-    public function iShouldSeeMoreThanNElementInTheNthParent($count, $element, $index, $parent): void
+    public function iShouldSeeMoreThanNElementInTheNthParent(int $count, string $element, int $index, string $parent): void
     {
         $actual = $this->countElements($element, $index, $parent);
         if ($actual < $count) {
@@ -289,7 +289,7 @@ class BrowserContext extends BaseContext
      * Checks, that element with given CSS is enabled.
      */
     #[Then('the element :element should be enabled')]
-    public function theElementShouldBeEnabled($element): void
+    public function theElementShouldBeEnabled(string $element): void
     {
         $node = $this->getSession()->getPage()->find('css', $element);
         if (null === $node) {
@@ -305,7 +305,7 @@ class BrowserContext extends BaseContext
      * Checks, that element with given CSS is disabled.
      */
     #[Then('the element :element should be disabled')]
-    public function theElementShouldBeDisabled($element): void
+    public function theElementShouldBeDisabled(string $element): void
     {
         $this->not(function () use ($element): void {
             $this->theElementShouldBeEnabled($element);
@@ -316,7 +316,7 @@ class BrowserContext extends BaseContext
      * Checks, that given select box contains the specified option.
      */
     #[Then('the :select select box should contain :option')]
-    public function theSelectBoxShouldContain($select, $option): void
+    public function theSelectBoxShouldContain(string $select, string $option): void
     {
         $select = str_replace('\\"', '"', $select);
         $option = str_replace('\\"', '"', $option);
@@ -335,7 +335,7 @@ class BrowserContext extends BaseContext
      * Checks, that given select box does not contain the specified option.
      */
     #[Then('the :select select box should not contain :option')]
-    public function theSelectBoxShouldNotContain($select, $option): void
+    public function theSelectBoxShouldNotContain(string $select, string $option): void
     {
         $this->not(function () use ($select, $option): void {
             $this->theSelectBoxShouldContain($select, $option);
@@ -346,7 +346,7 @@ class BrowserContext extends BaseContext
      * Checks, that the specified CSS element is visible.
      */
     #[Then('the :element element should be visible')]
-    public function theElementShouldBeVisible($element): void
+    public function theElementShouldBeVisible(string $element): void
     {
         $displayedNode = $this->getSession()->getPage()->find('css', $element);
         if (null === $displayedNode) {
@@ -361,13 +361,11 @@ class BrowserContext extends BaseContext
      * Checks, that the specified CSS element is not visible.
      */
     #[Then('the :element element should not be visible')]
-    public function theElementShouldNotBeVisible($element): void
+    public function theElementShouldNotBeVisible(string $element): void
     {
-        $exception = new \Exception("The element '$element' is visible");
-
         $this->not(function () use ($element): void {
             $this->theElementShouldBeVisible($element);
-        }, $exception);
+        }, "The element '$element' is visible");
     }
 
     /**
@@ -375,7 +373,7 @@ class BrowserContext extends BaseContext
      */
     #[When('(I )switch to iframe :name')]
     #[When('(I )switch to frame :name')]
-    public function switchToIFrame($name): void
+    public function switchToIFrame(string $name): void
     {
         $this->getSession()->switchToIFrame($name);
     }
@@ -394,7 +392,7 @@ class BrowserContext extends BaseContext
      */
     #[Then('(the )total elapsed time should be :comparison than :expected seconds')]
     #[Then('(the )total elapsed time should be :comparison to :expected seconds')]
-    public function elapsedTime($comparison, $expected): void
+    public function elapsedTime(string $comparison, int|float $expected): void
     {
         $elapsed = time() - $this->timerStartedAt;
 
