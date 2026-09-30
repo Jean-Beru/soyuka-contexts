@@ -7,16 +7,16 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class JsonInspector
 {
-    private $evaluationMode;
+    private readonly string $evaluationMode;
 
-    private $accessor;
+    private ?PropertyAccessor $accessor = null;
 
-    public function __construct($evaluationMode)
+    public function __construct(string $evaluationMode)
     {
         $this->evaluationMode = $evaluationMode;
     }
 
-    public function evaluate(Json $json, $expression)
+    public function evaluate(Json $json, string $expression): mixed
     {
         if (!class_exists(PropertyAccessor::class)) {
             throw new MissingDependencyException('JSON node access cannot be used as the PropertyAccess component is not installed. Try running "composer require --dev symfony/property-access".');
@@ -38,7 +38,7 @@ class JsonInspector
         }
     }
 
-    public function validate(Json $json, JsonSchema $schema)
+    public function validate(Json $json, JsonSchema $schema): bool
     {
         if (!class_exists(\JsonSchema\Validator::class)) {
             throw new MissingDependencyException('JSON schema validation cannot be used as the justinrainbow/json-schema package is not installed. Try running "composer require --dev justinrainbow/json-schema".');

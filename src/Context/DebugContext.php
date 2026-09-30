@@ -3,6 +3,8 @@
 namespace Behatch\Context;
 
 use Behat\Behat\Hook\Scope\AfterStepScope;
+use Behat\Gherkin\Node\BackgroundNode;
+use Behat\Gherkin\Node\ScenarioInterface;
 use Behat\Gherkin\Node\StepNode;
 use Behat\Hook\AfterStep;
 use Behat\Mink\Exception\DriverException;
@@ -12,12 +14,9 @@ use Behat\Step\When;
 
 class DebugContext extends BaseContext
 {
-    /**
-     * @var string
-     */
-    private $screenshotDir;
+    private readonly string $screenshotDir;
 
-    public function __construct($screenshotDir = '.')
+    public function __construct(string $screenshotDir = '.')
     {
         $this->screenshotDir = $screenshotDir;
     }
@@ -29,8 +28,7 @@ class DebugContext extends BaseContext
     public function iPutABreakpoint(): void
     {
         fwrite(\STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
-        while ('' == fgets(\STDIN, 1024)) {
-        }
+        fgets(\STDIN, 1024);
         fwrite(\STDOUT, "\033[u");
     }
 
@@ -38,7 +36,7 @@ class DebugContext extends BaseContext
      * Saving a screenshot.
      */
     #[When('(I )save a screenshot in :filename')]
-    public function iSaveAScreenshotIn($filename): void
+    public function iSaveAScreenshotIn(string $filename): void
     {
         sleep(1);
         $this->saveScreenshot($filename, $this->screenshotDir);
@@ -81,10 +79,7 @@ class DebugContext extends BaseContext
         }
     }
 
-    /**
-     * @return \Behat\Gherkin\Node\ScenarioInterface
-     */
-    private function getScenario(AfterStepScope $scope)
+    private function getScenario(AfterStepScope $scope): ScenarioInterface
     {
         $scenarios = $scope->getFeature()->getScenarios();
         foreach ($scenarios as $scenario) {
@@ -102,10 +97,7 @@ class DebugContext extends BaseContext
         throw new \LogicException('Unable to find the scenario');
     }
 
-    /**
-     * @return \Behat\Gherkin\Node\BackgroundNode|bool
-     */
-    private function getBackground(AfterStepScope $scope)
+    private function getBackground(AfterStepScope $scope): BackgroundNode|false
     {
         $background = $scope->getFeature()->getBackground();
         if (!$background) {
@@ -124,7 +116,7 @@ class DebugContext extends BaseContext
         return false;
     }
 
-    public function saveScreenshot($filename = null, $filepath = null): void
+    public function saveScreenshot(?string $filename = null, ?string $filepath = null): void
     {
         try {
             parent::saveScreenshot($filename, $filepath);

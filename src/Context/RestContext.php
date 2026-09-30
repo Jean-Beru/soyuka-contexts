@@ -4,6 +4,7 @@ namespace Behatch\Context;
 
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Step\Given;
 use Behat\Step\Then;
@@ -11,10 +12,7 @@ use Behatch\HttpCall\Request;
 
 class RestContext extends BaseContext
 {
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected Request $request;
 
     public function __construct(Request $request)
     {
@@ -25,7 +23,7 @@ class RestContext extends BaseContext
      * Sends a HTTP request.
      */
     #[Given('(I )send a :method request to :url')]
-    public function iSendARequestTo($method, $url, ?PyStringNode $body = null, $files = [])
+    public function iSendARequestTo(string $method, string $url, ?PyStringNode $body = null, array $files = []): DocumentElement
     {
         return $this->request->send(
             $method,
@@ -40,7 +38,7 @@ class RestContext extends BaseContext
      * Sends a HTTP request with a some parameters.
      */
     #[Given('(I )send a :method request to :url with parameters:')]
-    public function iSendARequestToWithParameters($method, $url, TableNode $data)
+    public function iSendARequestToWithParameters(string $method, string $url, TableNode $data): DocumentElement
     {
         $files = [];
         $parameters = [];
@@ -69,7 +67,7 @@ class RestContext extends BaseContext
      * Sends a HTTP request with a body.
      */
     #[Given('(I )send a :method request to :url with body:')]
-    public function iSendARequestToWithBody($method, $url, PyStringNode $body)
+    public function iSendARequestToWithBody(string $method, string $url, PyStringNode $body): DocumentElement
     {
         return $this->iSendARequestTo($method, $url, $body);
     }
@@ -102,7 +100,7 @@ class RestContext extends BaseContext
      * Checks, whether the header name is equal to given text.
      */
     #[Then('the header :name should be equal to :value')]
-    public function theHeaderShouldBeEqualTo($name, $value): void
+    public function theHeaderShouldBeEqualTo(string $name, string $value): void
     {
         $actual = $this->request->getHttpHeader($name);
         $this->assertEquals(strtolower($value), strtolower($actual),
@@ -114,10 +112,10 @@ class RestContext extends BaseContext
      * Checks, whether the header name is not equal to given text.
      */
     #[Then('the header :name should not be equal to :value')]
-    public function theHeaderShouldNotBeEqualTo($name, $value): void
+    public function theHeaderShouldNotBeEqualTo(string $name, string $value): void
     {
         $actual = $this->getSession()->getResponseHeader($name);
-        if (strtolower($value) == strtolower($actual)) {
+        if (strtolower($value) == strtolower($actual ?? '')) {
             throw new ExpectationException("The header '$name' is equal to '$actual'", $this->getSession()->getDriver());
         }
     }
@@ -126,7 +124,7 @@ class RestContext extends BaseContext
      * Checks, whether the header name contains the given text.
      */
     #[Then('the header :name should contain :value')]
-    public function theHeaderShouldContain($name, $value): void
+    public function theHeaderShouldContain(string $name, string $value): void
     {
         $actual = $this->request->getHttpHeader($name);
         $this->assertContains($value, $actual,
@@ -138,7 +136,7 @@ class RestContext extends BaseContext
      * Checks, whether the header name doesn't contain the given text.
      */
     #[Then('the header :name should not contain :value')]
-    public function theHeaderShouldNotContain($name, $value): void
+    public function theHeaderShouldNotContain(string $name, string $value): void
     {
         $this->assertNotContains($value, $this->request->getHttpHeader($name),
             "The header '$name' contains '$value'"
@@ -149,20 +147,20 @@ class RestContext extends BaseContext
      * Checks, whether the header not exist.
      */
     #[Then('the header :name should not exist')]
-    public function theHeaderShouldNotExist($name): void
+    public function theHeaderShouldNotExist(string $name): void
     {
         $this->not(function () use ($name): void {
             $this->theHeaderShouldExist($name);
         }, "The header '$name' exists");
     }
 
-    protected function theHeaderShouldExist($name)
+    protected function theHeaderShouldExist(string $name): string
     {
         return $this->request->getHttpHeader($name);
     }
 
     #[Then('the header :name should match :regex')]
-    public function theHeaderShouldMatch($name, $regex): void
+    public function theHeaderShouldMatch(string $name, string $regex): void
     {
         $actual = $this->request->getHttpHeader($name);
 
@@ -174,7 +172,7 @@ class RestContext extends BaseContext
     }
 
     #[Then('the header :name should not match :regex')]
-    public function theHeaderShouldNotMatch($name, $regex): void
+    public function theHeaderShouldNotMatch(string $name, string $regex): void
     {
         $this->not(
             function () use ($name, $regex): void {
@@ -202,13 +200,13 @@ class RestContext extends BaseContext
      * Add an header element in a request.
      */
     #[Then('(I )add :name header equal to :value')]
-    public function iAddHeaderEqualTo($name, $value): void
+    public function iAddHeaderEqualTo(string $name, string $value): void
     {
         $this->request->setHttpHeader($name, $value);
     }
 
     #[Then('the response should be encoded in :encoding')]
-    public function theResponseShouldBeEncodedIn($encoding): void
+    public function theResponseShouldBeEncodedIn(string $encoding): void
     {
         $content = $this->request->getContent();
         if (!mb_check_encoding($content, $encoding)) {

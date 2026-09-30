@@ -28,6 +28,7 @@ final class JsonContextTest extends TestCase
                 'a true node' => true,
                 'a false node' => false,
                 'a number node' => 3,
+                'a numeric string node' => '12',
                 'an array node' => [
                     'one',
                     'two',
@@ -178,6 +179,15 @@ final class JsonContextTest extends TestCase
 
         $this->expectExceptionMessage("The node 'a string node' value is '\"some string\"', string 'expected' expected");
         $this->context->theJsonNodeShouldBeEqualToTheString('a string node', 'expected');
+    }
+
+    public function testTheJsonNodeShouldBeEqualToANumericString(): void
+    {
+        // Behat turns the "12" step argument into an int with the castToInt() transformation
+        $this->context->theJsonNodeShouldBeEqualToTheString('a numeric string node', $this->context->castToInt('12'));
+
+        $this->expectExceptionMessage("The node 'a number node' value is '3', string '3' expected");
+        $this->context->theJsonNodeShouldBeEqualToTheString('a number node', '3');
     }
 
     public function testTheJsonNodeShouldBeEqualToTheNumber(): void
