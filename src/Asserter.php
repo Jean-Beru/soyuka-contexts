@@ -6,7 +6,7 @@ use Behat\Mink\Exception\ExpectationException;
 
 trait Asserter
 {
-    protected function not(callable $callbable, $errorMessage): void
+    protected function not(callable $callbable, string $errorMessage): void
     {
         try {
             $callbable();
@@ -19,14 +19,14 @@ trait Asserter
         throw new ExpectationException($errorMessage, $this->getSession()->getDriver());
     }
 
-    protected function assert($test, $message): void
+    protected function assert(bool $test, string $message): void
     {
         if (false === $test) {
             throw new ExpectationException($message, $this->getSession()->getDriver());
         }
     }
 
-    protected function assertContains($expected, $actual, $message = null): void
+    protected function assertContains(string $expected, string $actual, ?string $message = null): void
     {
         $regex = '/'.preg_quote($expected, '/').'/ui';
 
@@ -36,7 +36,7 @@ trait Asserter
         );
     }
 
-    protected function assertNotContains($expected, $actual, $message = null): void
+    protected function assertNotContains(string $expected, string $actual, ?string $message = null): void
     {
         $message = $message ?: "The string '$expected' was found.";
 
@@ -45,15 +45,15 @@ trait Asserter
         }, $message);
     }
 
-    protected function assertCount($expected, array $elements, $message = null): void
+    protected function assertCount(int $expected, array $elements, ?string $message = null): void
     {
         $this->assert(
-            (int) $expected === \count($elements),
+            $expected === \count($elements),
             $message ?: \sprintf('%d elements found, but should be %d.', \count($elements), $expected)
         );
     }
 
-    protected function assertEquals($expected, $actual, $message = null): void
+    protected function assertEquals(mixed $expected, mixed $actual, ?string $message = null): void
     {
         $this->assert(
             $expected == $actual,
@@ -61,7 +61,7 @@ trait Asserter
         );
     }
 
-    protected function assertSame($expected, $actual, $message = null): void
+    protected function assertSame(mixed $expected, mixed $actual, ?string $message = null): void
     {
         $this->assert(
             $expected === $actual,
@@ -69,7 +69,7 @@ trait Asserter
         );
     }
 
-    protected function assertArrayHasKey($key, $array, $message = null): void
+    protected function assertArrayHasKey(int|string $key, array|\ArrayAccess $array, ?string $message = null): void
     {
         $this->assert(
             isset($array[$key]),
@@ -77,7 +77,7 @@ trait Asserter
         );
     }
 
-    protected function assertArrayNotHasKey($key, $array, $message = null): void
+    protected function assertArrayNotHasKey(int|string $key, array|\ArrayAccess $array, ?string $message = null): void
     {
         $message = $message ?: "The array has key '$key'";
 
@@ -86,12 +86,12 @@ trait Asserter
         }, $message);
     }
 
-    protected function assertTrue($value, $message = 'The value is false'): void
+    protected function assertTrue(bool $value, string $message = 'The value is false'): void
     {
         $this->assert($value, $message);
     }
 
-    protected function assertFalse($value, $message = 'The value is true'): void
+    protected function assertFalse(bool $value, string $message = 'The value is true'): void
     {
         $this->not(function () use ($value): void {
             $this->assertTrue($value);

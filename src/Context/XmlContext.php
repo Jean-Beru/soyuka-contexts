@@ -32,15 +32,9 @@ class XmlContext extends BaseContext
 
     /**
      * Checks that the specified XML element exists.
-     *
-     * @param string $element
-     *
-     * @throws \Exception
-     *
-     * @return \DomNodeList
      */
     #[Then('the XML element :element should exist(s)')]
-    public function theXmlElementShouldExist($element)
+    public function theXmlElementShouldExist(string $element): \DOMNodeList
     {
         $elements = $this->getDom()
             ->xpath($element);
@@ -56,7 +50,7 @@ class XmlContext extends BaseContext
      * Checks that the specified XML element does not exist.
      */
     #[Then('the XML element :element should not exist(s)')]
-    public function theXmlElementShouldNotExist($element): void
+    public function theXmlElementShouldNotExist(string $element): void
     {
         $this->not(function () use ($element): void {
             $this->theXmlElementShouldExist($element);
@@ -67,7 +61,7 @@ class XmlContext extends BaseContext
      * Checks that the specified XML element is equal to the given value.
      */
     #[Then('the XML element :element should be equal to :text')]
-    public function theXmlElementShouldBeEqualTo($element, $text): void
+    public function theXmlElementShouldBeEqualTo(string $element, string $text): void
     {
         $elements = $this->theXmlElementShouldExist($element);
 
@@ -82,7 +76,7 @@ class XmlContext extends BaseContext
      * Checks that the specified XML element is not equal to the given value.
      */
     #[Then('the XML element :element should not be equal to :text')]
-    public function theXmlElementShouldNotBeEqualTo($element, $text): void
+    public function theXmlElementShouldNotBeEqualTo(string $element, string $text): void
     {
         $this->not(fn () => $this->theXmlElementShouldBeEqualTo($element, $text), "The element '$element' value is not '$text'");
     }
@@ -91,7 +85,7 @@ class XmlContext extends BaseContext
      * Checks that the XML attribute on the specified element exists.
      */
     #[Then('the XML attribute :attribute on element :element should exist(s)')]
-    public function theXmlAttributeShouldExist($attribute, $element)
+    public function theXmlAttributeShouldExist(string $attribute, string $element): string
     {
         $elements = $this->theXmlElementShouldExist("{$element}[@{$attribute}]");
 
@@ -101,7 +95,7 @@ class XmlContext extends BaseContext
 
         $actual = $element->getAttribute($attribute);
 
-        if (empty($actual)) {
+        if ('' === $actual) {
             throw new \Exception("The attribute value is '$actual'");
         }
 
@@ -112,7 +106,7 @@ class XmlContext extends BaseContext
      * Checks that the XML attribute on the specified element does not exist.
      */
     #[Then('the XML attribute :attribute on element :element should not exist(s)')]
-    public function theXmlAttributeShouldNotExist($attribute, $element): void
+    public function theXmlAttributeShouldNotExist(string $attribute, string $element): void
     {
         $this->theXmlElementShouldNotExist("{$element}[@{$attribute}]");
     }
@@ -121,7 +115,7 @@ class XmlContext extends BaseContext
      * Checks that the XML attribute on the specified element is equal to the given value.
      */
     #[Then('the XML attribute :attribute on element :element should be equal to :text')]
-    public function theXmlAttributeShouldBeEqualTo($attribute, $element, $text): void
+    public function theXmlAttributeShouldBeEqualTo(string $attribute, string $element, string $text): void
     {
         $actual = $this->theXmlAttributeShouldExist($attribute, $element);
 
@@ -134,7 +128,7 @@ class XmlContext extends BaseContext
      * Checks that the XML attribute on the specified element is not equal to the given value.
      */
     #[Then('the XML attribute :attribute on element :element should not be equal to :text')]
-    public function theXmlAttributeShouldNotBeEqualTo($attribute, $element, $text): void
+    public function theXmlAttributeShouldNotBeEqualTo(string $attribute, string $element, string $text): void
     {
         $actual = $this->theXmlAttributeShouldExist($attribute, $element);
 
@@ -147,7 +141,7 @@ class XmlContext extends BaseContext
      * Checks that the given XML element has N child element(s).
      */
     #[Then('the XML element :element should have :count element(s)')]
-    public function theXmlElementShouldHaveNChildElements($element, $count): void
+    public function theXmlElementShouldHaveNChildElements(string $element, int $count): void
     {
         $elements = $this->theXmlElementShouldExist($element);
 
@@ -165,7 +159,7 @@ class XmlContext extends BaseContext
      * Checks that the given XML element contains the given value.
      */
     #[Then('the XML element :element should contain :text')]
-    public function theXmlElementShouldContain($element, $text): void
+    public function theXmlElementShouldContain(string $element, string $text): void
     {
         $elements = $this->theXmlElementShouldExist($element);
 
@@ -176,7 +170,7 @@ class XmlContext extends BaseContext
      * Checks that the given XML element does not contain the given value.
      */
     #[Then('the XML element :element should not contain :text')]
-    public function theXmlElementShouldNotContain($element, $text): void
+    public function theXmlElementShouldNotContain(string $element, string $text): void
     {
         $elements = $this->theXmlElementShouldExist($element);
 
@@ -187,7 +181,7 @@ class XmlContext extends BaseContext
      * Checks that the XML uses the specified namespace.
      */
     #[Then('the XML should use the namespace :namespace')]
-    public function theXmlShouldUseTheNamespace($namespace): void
+    public function theXmlShouldUseTheNamespace(string $namespace): void
     {
         $namespaces = $this->getDom()
             ->getNamespaces();
@@ -201,7 +195,7 @@ class XmlContext extends BaseContext
      * Checks that the XML does not use the specified namespace.
      */
     #[Then('the XML should not use the namespace :namespace')]
-    public function theXmlShouldNotUseTheNamespace($namespace): void
+    public function theXmlShouldNotUseTheNamespace(string $namespace): void
     {
         $namespaces = $this->getDom()
             ->getNamespaces();
@@ -238,7 +232,7 @@ class XmlContext extends BaseContext
     }
 
     #[Then('the XML feed should be valid according to the XSD :filename')]
-    public function theXmlFeedShouldBeValidAccordingToTheXsd($filename): void
+    public function theXmlFeedShouldBeValidAccordingToTheXsd(string $filename): void
     {
         if (is_file($filename)) {
             $xsd = file_get_contents($filename);
@@ -257,7 +251,7 @@ class XmlContext extends BaseContext
     }
 
     #[Then('the XML feed should be valid according to the relax NG schema :filename')]
-    public function theXmlFeedShouldBeValidAccordingToTheRelaxNgSchema($filename): void
+    public function theXmlFeedShouldBeValidAccordingToTheRelaxNgSchema(string $filename): void
     {
         if (is_file($filename)) {
             $ng = file_get_contents($filename);
@@ -291,7 +285,7 @@ class XmlContext extends BaseContext
         );
     }
 
-    private function getDom()
+    private function getDom(): Dom
     {
         $content = $this->getSession()->getPage()->getContent();
 

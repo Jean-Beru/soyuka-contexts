@@ -7,16 +7,16 @@ use JsonSchema\Validator;
 
 class JsonSchema extends Json
 {
-    private $uri;
+    private readonly ?string $uri;
 
-    public function __construct($content, $uri = null)
+    public function __construct(string|\Stringable $content, ?string $uri = null)
     {
         $this->uri = $uri;
 
         parent::__construct($content);
     }
 
-    public function resolve(SchemaStorage $resolver)
+    public function resolve(SchemaStorage $resolver): static
     {
         if (!$this->hasUri()) {
             return $this;
@@ -27,7 +27,7 @@ class JsonSchema extends Json
         return $this;
     }
 
-    public function validate(Json $json, Validator $validator)
+    public function validate(Json $json, Validator $validator): bool
     {
         $content = $json->getContent();
         $validator->validate($content, $this->getContent());
@@ -43,7 +43,7 @@ class JsonSchema extends Json
         return true;
     }
 
-    private function hasUri()
+    private function hasUri(): bool
     {
         return null !== $this->uri;
     }

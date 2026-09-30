@@ -3,55 +3,57 @@
 namespace Behatch\HttpCall\Request;
 
 use Behat\Mink\Driver\BrowserKitDriver;
+use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Mink;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\Request as BrowserKitRequest;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
 class BrowserKit
 {
-    protected $mink;
+    protected Mink $mink;
 
     public function __construct(Mink $mink)
     {
         $this->mink = $mink;
     }
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->getRequest()
             ->getMethod();
     }
 
-    public function getUri()
+    public function getUri(): string
     {
         return $this->getRequest()
             ->getUri();
     }
 
-    public function getServer()
+    public function getServer(): array
     {
         return $this->getRequest()
             ->getServer();
     }
 
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->getRequest()
             ->getParameters();
     }
 
-    protected function getRequest()
+    protected function getRequest(): BrowserKitRequest
     {
         return $this->getClient()->getInternalRequest();
     }
 
-    public function getContent()
+    public function getContent(): string
     {
         return $this->mink->getSession()->getPage()->getContent();
     }
 
-    public function send($method, $url, $parameters = [], $files = [], ?string $content = null, $headers = [])
+    public function send(string $method, string $url, array $parameters = [], array $files = [], ?string $content = null, array $headers = []): DocumentElement
     {
         $client = $this->getClient();
 
@@ -78,7 +80,7 @@ class BrowserKit
         return $this->mink->getSession()->getPage();
     }
 
-    public function setHttpHeader($name, $value): void
+    public function setHttpHeader(string $name, string $value): void
     {
         /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
         $contentHeaders = ['CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true];
@@ -93,7 +95,7 @@ class BrowserKit
         $this->getClient()->setServerParameter($name, $value);
     }
 
-    public function getHttpHeaders()
+    public function getHttpHeaders(): array
     {
         return array_change_key_case(
             $this->mink->getSession()->getResponseHeaders(),
@@ -101,14 +103,14 @@ class BrowserKit
         );
     }
 
-    public function getHttpHeader($name)
+    public function getHttpHeader(string $name): string
     {
         $values = $this->getHttpRawHeader($name);
 
         return implode(', ', $values);
     }
 
-    public function getHttpRawHeader($name)
+    public function getHttpRawHeader(string $name): array
     {
         $name = strtolower($name);
         $headers = $this->getHttpHeaders();

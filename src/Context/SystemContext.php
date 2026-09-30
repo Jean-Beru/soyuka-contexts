@@ -10,13 +10,13 @@ use Behat\Step\Then;
 
 class SystemContext implements Context
 {
-    private $root;
-    private ?array $output = null;
-    private $lastExecutionTime;
+    private readonly string $root;
+    private array $output = [];
+    private ?float $lastExecutionTime = null;
     private ?int $lastReturnCode = null;
-    private $createdFiles = [];
+    private array $createdFiles = [];
 
-    public function __construct($root = '.')
+    public function __construct(string $root = '.')
     {
         $this->root = $root;
     }
@@ -30,8 +30,10 @@ class SystemContext implements Context
      * Execute a command.
      */
     #[Given('(I )execute :command')]
-    public function iExecute($cmd): void
+    public function iExecute(string $cmd): void
     {
+        // exec() appends to the given array
+        $this->output = [];
         $start = microtime(true);
 
         exec($cmd, $this->output, $this->lastReturnCode);
@@ -43,7 +45,7 @@ class SystemContext implements Context
      * Execute a command from project root.
      */
     #[Given('(I )execute :command from project root')]
-    public function iExecuteFromProjectRoot($cmd): void
+    public function iExecuteFromProjectRoot(string $cmd): void
     {
         $cmd = $this->root.\DIRECTORY_SEPARATOR.$cmd;
         $this->iExecute($cmd);
@@ -84,7 +86,7 @@ class SystemContext implements Context
      * Command should last less than.
      */
     #[Then('command should last less than :seconds seconds')]
-    public function commandShouldLastLessThan($seconds): void
+    public function commandShouldLastLessThan(float $seconds): void
     {
         if ($this->lastExecutionTime > $seconds) {
             throw new \Exception(\sprintf('Last command last %s which is more than %s seconds', $this->lastExecutionTime, $seconds));
@@ -95,7 +97,7 @@ class SystemContext implements Context
      * Command should last more than.
      */
     #[Then('command should last more than :seconds seconds')]
-    public function commandShouldMoreLessThan($seconds): void
+    public function commandShouldMoreLessThan(float $seconds): void
     {
         if ($this->lastExecutionTime < $seconds) {
             throw new \Exception(\sprintf('Last command last %s which is less than %s seconds', $this->lastExecutionTime, $seconds));
@@ -106,7 +108,7 @@ class SystemContext implements Context
      * Checks, that output contains specified text.
      */
     #[Then('output should contain :text')]
-    public function outputShouldContain($text): void
+    public function outputShouldContain(string $text): void
     {
         $regex = '~'.$text.'~ui';
 
@@ -127,7 +129,7 @@ class SystemContext implements Context
      * Checks, that output not contains specified text.
      */
     #[Then('output should not contain :text')]
-    public function outputShouldNotContain($text): void
+    public function outputShouldNotContain(string $text): void
     {
         $regex = '~'.$text.'~ui';
 
@@ -168,7 +170,7 @@ class SystemContext implements Context
     }
 
     #[Given('(I )create the file :filename containing:')]
-    public function iCreateTheFileContaining($filename, PyStringNode $string): void
+    public function iCreateTheFileContaining(string $filename, PyStringNode $string): void
     {
         if (!is_file($filename)) {
             file_put_contents($filename, $string);
@@ -179,7 +181,7 @@ class SystemContext implements Context
     }
 
     #[Then('print the content of :filename file')]
-    public function printTheContentOfFile($filename): void
+    public function printTheContentOfFile(string $filename): void
     {
         if (is_file($filename)) {
             echo file_get_contents($filename);

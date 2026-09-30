@@ -6,7 +6,7 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Mink;
 
 /**
- * @method DocumentElement send(string $method, string $url, array $parameters = [], array $files = [], string $content = null, array $headers = [])
+ * @method DocumentElement send(string $method, string $url, array $parameters = [], array $files = [], ?string $content = null, array $headers = [])
  * @method string          getMethod()
  * @method string          getUri()
  * @method array           getServer()
@@ -14,37 +14,25 @@ use Behat\Mink\Mink;
  * @method array           getHttpHeaders()
  * @method string          getHttpHeader(string $name)
  * @method void            setHttpHeader(string $name, string $value)
- * @method string          getHttpRawHeader(string $name)
+ * @method array           getHttpRawHeader(string $name)
  * @method string          getContent()
  */
 class Request
 {
-    /**
-     * @var Mink
-     */
-    private $mink;
-    private $client;
+    private readonly Mink $mink;
+    private ?Request\BrowserKit $client = null;
 
-    /**
-     * Request constructor.
-     */
     public function __construct(Mink $mink)
     {
         $this->mink = $mink;
     }
 
-    /**
-     * @param string $name
-     */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments): mixed
     {
         return \call_user_func_array([$this->getClient(), $name], $arguments);
     }
 
-    /**
-     * @return Request\BrowserKit
-     */
-    private function getClient()
+    private function getClient(): Request\BrowserKit
     {
         return $this->client ??= new Request\BrowserKit($this->mink);
     }

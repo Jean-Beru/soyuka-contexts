@@ -6,19 +6,19 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class Json implements \Stringable
 {
-    protected $content;
+    protected mixed $content;
 
-    public function __construct($content)
+    public function __construct(string|\Stringable $content)
     {
         $this->content = $this->decode((string) $content);
     }
 
-    public function getContent()
+    public function getContent(): mixed
     {
         return $this->content;
     }
 
-    public function read($expression, PropertyAccessor $accessor)
+    public function read(string $expression, PropertyAccessor $accessor): mixed
     {
         if (\is_array($this->content)) {
             $expression = preg_replace('/^root/', '', $expression);
@@ -34,11 +34,11 @@ class Json implements \Stringable
         return $accessor->getValue($this->content, $expression);
     }
 
-    public function encode($pretty = true)
+    public function encode(bool $pretty = true): string
     {
-        $flags = \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE;
+        $flags = \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR;
 
-        if (true === $pretty && \defined('JSON_PRETTY_PRINT')) {
+        if ($pretty) {
             $flags |= \JSON_PRETTY_PRINT;
         }
 
@@ -50,7 +50,7 @@ class Json implements \Stringable
         return $this->encode(false);
     }
 
-    private function decode($content)
+    private function decode(string $content): mixed
     {
         $result = json_decode($content);
 

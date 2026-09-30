@@ -6,14 +6,12 @@ use Behat\Behat\Context\Argument\ArgumentResolver;
 
 class HttpCallResultPoolResolver implements ArgumentResolver
 {
-    private array $dependencies;
+    private array $dependencies = [];
 
-    public function __construct(/* ... */)
+    public function __construct(object ...$dependencies)
     {
-        $this->dependencies = [];
-
-        foreach (\func_get_args() as $param) {
-            $this->dependencies[$param::class] = $param;
+        foreach ($dependencies as $dependency) {
+            $this->dependencies[$dependency::class] = $dependency;
         }
     }
 

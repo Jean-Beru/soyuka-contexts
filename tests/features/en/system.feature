@@ -25,6 +25,12 @@ Feature: System feature
         And output should not contain "Hello John"
         And output should not contain "Hel.*hn"
 
+    Scenario: Testing the output of the last command only
+        Given I execute "echo 'Hello world'"
+        And I execute "echo 'How are you?'"
+        Then output should contain "How are you"
+        And output should not contain "Hello world"
+
     Scenario: Testing execution output wall output
         Given I execute "echo 'Hello world\nHow are you?'"
         Then output should be:
