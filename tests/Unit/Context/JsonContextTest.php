@@ -8,6 +8,7 @@ use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behatch\Context\JsonContext;
+use Behatch\Exception\TruncatableExpectationException;
 use Behatch\HttpCall\HttpCallResult;
 use Behatch\HttpCall\HttpCallResultPool;
 use PHPUnit\Framework\TestCase;
@@ -98,6 +99,26 @@ final class JsonContextTest extends TestCase
             1 => ['a string node', 'other'],
             2 => ['another string node', 'other'],
         ]));
+    }
+
+    public function testTheContainMessagesCutLongValues(): void
+    {
+        $value = str_repeat('a', 150).str_repeat('b', 150);
+        $httpCallResultPool = new HttpCallResultPool();
+        $httpCallResultPool->store(new HttpCallResult(json_encode(['long' => $value], \JSON_THROW_ON_ERROR)));
+        $context = $this->createContext($httpCallResultPool);
+
+        foreach ([
+            'should contain' => static fn () => $context->theJsonNodeShouldContain('long', 'expected'),
+            'should not contain' => static fn () => $context->theJsonNodeShouldNotContain('long', 'b'),
+        ] as $assertion => $step) {
+            $exception = $this->catchExpectation($step);
+            $text = 'should contain' === $assertion ? 'expected' : 'b';
+
+            $this->assertInstanceOf(TruncatableExpectationException::class, $exception);
+            $this->assertSame("The node 'long' $assertion '$text', but it is '$value'.", $exception->getMessage());
+            $this->assertSame("The node 'long' $assertion '$text', but it is '".str_repeat('a', 150).str_repeat('b', 47)."...'.", $exception->getShortMessage());
+        }
     }
 
     private function catchExpectation(callable $step): ExpectationException

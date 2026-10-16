@@ -3,8 +3,10 @@
 namespace Behatch;
 
 use Behat\Behat\Context\ServiceContainer\ContextExtension;
+use Behat\Testwork\Exception\ServiceContainer\ExceptionExtension;
 use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+use Behatch\Exception\TruncatableExceptionStringer;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
@@ -40,6 +42,7 @@ class Extension implements ExtensionInterface
         $loader->load('http_call.yml');
 
         $this->loadClassResolver($container);
+        $this->loadExceptionStringer($container);
     }
 
     public function configure(ArrayNodeDefinition $builder): void
@@ -51,6 +54,13 @@ class Extension implements ExtensionInterface
         $definition = new Definition('Behatch\Context\ContextClass\ClassResolver');
         $definition->addTag(ContextExtension::CLASS_RESOLVER_TAG);
         $container->setDefinition('behatch.class_resolver', $definition);
+    }
+
+    private function loadExceptionStringer(ContainerBuilder $container): void
+    {
+        $definition = new Definition(TruncatableExceptionStringer::class);
+        $definition->addTag(ExceptionExtension::STRINGER_TAG);
+        $container->setDefinition('behatch.exception_stringer.truncatable', $definition);
     }
 
     private function loadHttpCallListener(ContainerBuilder $container): void

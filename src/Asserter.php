@@ -4,10 +4,11 @@ namespace Behatch;
 
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
+use Behatch\Exception\TruncatableExpectationException;
 
 trait Asserter
 {
-    protected function not(callable $callbable, string $errorMessage): void
+    protected function not(callable $callbable, string $errorMessage, ?string $shortMessage = null): void
     {
         try {
             $callbable();
@@ -18,33 +19,48 @@ trait Asserter
             return;
         }
 
-        throw new ExpectationException($errorMessage, $this->getSession()->getDriver());
+        throw $this->createExpectationException($errorMessage, $shortMessage);
     }
 
-    protected function assert(bool $test, string $message): void
+    /**
+     * @param ?string $shortMessage printed instead of $message when Behat runs without -v
+     */
+    protected function assert(bool $test, string $message, ?string $shortMessage = null): void
     {
         if (false === $test) {
-            throw new ExpectationException($message, $this->getSession()->getDriver());
+            throw $this->createExpectationException($message, $shortMessage);
         }
     }
 
-    protected function assertContains(string $expected, string $actual, ?string $message = null): void
+    protected function assertContains(string $expected, string $actual, ?string $message = null, ?string $shortMessage = null): void
     {
         $regex = '/'.preg_quote($expected, '/').'/ui';
 
         $this->assert(
             preg_match($regex, $actual) > 0,
-            $message ?: "The string '$expected' was not found."
+            $message ?: "The string '$expected' was not found.",
+            $shortMessage
         );
     }
 
-    protected function assertNotContains(string $expected, string $actual, ?string $message = null): void
+    protected function assertNotContains(string $expected, string $actual, ?string $message = null, ?string $shortMessage = null): void
     {
         $message = $message ?: "The string '$expected' was found.";
 
         $this->not(function () use ($expected, $actual): void {
             $this->assertContains($expected, $actual);
-        }, $message);
+        }, $message, $shortMessage);
+    }
+
+    private function createExpectationException(string $message, ?string $shortMessage): ExpectationException
+    {
+        $driver = $this->getSession()->getDriver();
+
+        if (null === $shortMessage || $shortMessage === $message) {
+            return new ExpectationException($message, $driver);
+        }
+
+        return new TruncatableExpectationException($message, $driver, $shortMessage);
     }
 
     protected function assertCount(int $expected, array $elements, ?string $message = null): void
