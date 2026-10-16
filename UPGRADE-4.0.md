@@ -46,6 +46,9 @@ Drivers and sessions
 
 * Goutte support is removed: use the `browserkit_http` Mink session
   (`behat/mink-browserkit-driver`, `symfony/http-client` and `symfony/mime`).
+* This project is not tested against Selenium2 anymore. Behatch still handles the
+  Selenium2 driver exceptions. Use any Mink driver supported by the Mink extension 3 (e.g.
+  `selenium4`, `webdriver_classic` or Panther).
 * `Behatch\HttpCall\Request\Goutte` is removed and the `symfony2` Mink session name has no
   special meaning anymore: headers added with `I add :name header equal to :value` are
   stored as client server parameters, which are reset after each request.
