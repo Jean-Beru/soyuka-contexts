@@ -8,6 +8,9 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behatch\HttpCall\Request\BrowserKit;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\BrowserKit\HttpBrowser;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +38,22 @@ final class BrowserKitTest extends TestCase
         $file = $kernel->request->files->get('upload');
         $this->assertInstanceOf(UploadedFile::class, $file);
         $this->assertSame('lorem.txt', $file->getClientOriginalName());
+    }
+
+    public function testNoDefaultAcceptHeaderWithHttpBrowser(): void
+    {
+        $headers = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$headers): MockResponse {
+            $headers = $options['normalized_headers'];
+
+            return new MockResponse();
+        });
+
+        $this->createBrowserKit(new BrowserKitDriver(new HttpBrowser($client)))
+            ->send('GET', 'http://localhost/');
+
+        // an empty value also prevents the default "Accept: */*" of HttpClient
+        $this->assertSame([], $headers['accept']);
     }
 
     public function testRequestsNeedABrowserKitSession(): void
