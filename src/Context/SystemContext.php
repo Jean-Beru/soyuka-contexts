@@ -2,13 +2,13 @@
 
 namespace Behatch\Context;
 
-use Behat\Behat\Context\Context;
+use Behat\Behat\Context\TranslatableContext;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Hook\AfterScenario;
 use Behat\Step\Given;
 use Behat\Step\Then;
 
-class SystemContext implements Context
+class SystemContext implements TranslatableContext
 {
     private readonly string $root;
     private array $output = [];
