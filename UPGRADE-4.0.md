@@ -18,7 +18,7 @@ Requirements
 
 * PHP 8.3 or higher is required (3.4 supports PHP 8.1+).
 * Behat 4 is required. Behat 3 is not supported anymore.
-* Symfony 7.4 is required.
+* Symfony 7.4 or 8 is required.
 * `friends-of-behat/mink-extension` 3 is required. It is only available as an alpha
   release for now, require it from your root `composer.json` along with this library:
   `composer require --dev -W soyuka/contexts:^4.0 friends-of-behat/mink-extension:^3.0@alpha`.
