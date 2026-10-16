@@ -43,8 +43,7 @@ class JsonInspector
 
         $validator = new \JsonSchema\Validator();
 
-        $resolver = new \JsonSchema\SchemaStorage(new \JsonSchema\Uri\UriRetriever(), new \JsonSchema\Uri\UriResolver());
-        $schema->resolve($resolver);
+        $schema->resolve(new \JsonSchema\SchemaStorage());
 
         return $schema->validate($json, $validator);
     }

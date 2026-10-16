@@ -112,16 +112,11 @@ class BrowserKit
         $name = strtolower($name);
         $headers = $this->getHttpHeaders();
 
-        if (isset($headers[$name])) {
-            $value = $headers[$name];
-            if (!\is_array($headers[$name])) {
-                $value = [$headers[$name]];
-            }
-        } else {
+        if (!isset($headers[$name])) {
             throw new \OutOfBoundsException("The header '$name' doesn't exist");
         }
 
-        return $value;
+        return (array) $headers[$name];
     }
 
     protected function resetHttpHeaders(): void
