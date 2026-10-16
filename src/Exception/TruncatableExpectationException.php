@@ -13,12 +13,8 @@ use Behat\Mink\Exception\ExpectationException;
  */
 final class TruncatableExpectationException extends ExpectationException
 {
-    private readonly string $shortMessage;
-
-    public function __construct(string $message, DriverInterface $driver, string $shortMessage)
+    public function __construct(string $message, DriverInterface $driver, private readonly string $shortMessage)
     {
-        $this->shortMessage = $shortMessage;
-
         parent::__construct($message, $driver);
     }
 

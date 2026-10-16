@@ -19,12 +19,10 @@ use Behat\Mink\Mink;
  */
 class Request
 {
-    private readonly Mink $mink;
     private ?Request\BrowserKit $client = null;
 
-    public function __construct(Mink $mink)
+    public function __construct(private readonly Mink $mink)
     {
-        $this->mink = $mink;
     }
 
     public function __call(string $name, array $arguments): mixed

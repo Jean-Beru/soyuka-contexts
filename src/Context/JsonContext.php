@@ -15,12 +15,9 @@ class JsonContext extends BaseContext
 {
     protected JsonInspector $inspector;
 
-    protected HttpCallResultPool $httpCallResultPool;
-
-    public function __construct(HttpCallResultPool $httpCallResultPool, string $evaluationMode = 'javascript')
+    public function __construct(protected HttpCallResultPool $httpCallResultPool, string $evaluationMode = 'javascript')
     {
         $this->inspector = new JsonInspector($evaluationMode);
-        $this->httpCallResultPool = $httpCallResultPool;
     }
 
     /**

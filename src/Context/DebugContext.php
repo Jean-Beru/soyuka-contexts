@@ -14,11 +14,8 @@ use Behat\Step\When;
 
 class DebugContext extends BaseContext
 {
-    private readonly string $screenshotDir;
-
-    public function __construct(string $screenshotDir = '.')
+    public function __construct(private readonly string $screenshotDir = '.')
     {
-        $this->screenshotDir = $screenshotDir;
     }
 
     /**

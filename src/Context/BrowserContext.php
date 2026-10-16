@@ -17,13 +17,11 @@ use WebDriver\Exception\StaleElementReference;
 
 class BrowserContext extends BaseContext
 {
-    private readonly float $timeout;
     private string $dateFormat = 'dmYHi';
     private int $timerStartedAt;
 
-    public function __construct(float $timeout = 1)
+    public function __construct(private readonly float $timeout = 1)
     {
-        $this->timeout = $timeout;
     }
 
     #[AfterScenario]

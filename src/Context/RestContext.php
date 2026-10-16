@@ -12,11 +12,8 @@ use Behatch\HttpCall\Request;
 
 class RestContext extends BaseContext
 {
-    protected Request $request;
-
-    public function __construct(Request $request)
+    public function __construct(protected Request $request)
     {
-        $this->request = $request;
     }
 
     /**

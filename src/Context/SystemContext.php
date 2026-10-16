@@ -10,15 +10,13 @@ use Behat\Step\Then;
 
 class SystemContext implements TranslatableContext
 {
-    private readonly string $root;
     private array $output = [];
     private ?float $lastExecutionTime = null;
     private ?int $lastReturnCode = null;
     private array $createdFiles = [];
 
-    public function __construct(string $root = '.')
+    public function __construct(private readonly string $root = '.')
     {
-        $this->root = $root;
     }
 
     public static function getTranslationResources(): array
