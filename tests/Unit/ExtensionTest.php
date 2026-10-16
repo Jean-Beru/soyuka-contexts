@@ -2,6 +2,8 @@
 
 namespace Behatch\Tests\Unit;
 
+use Behat\Testwork\Exception\ServiceContainer\ExceptionExtension;
+use Behatch\Exception\TruncatableExceptionStringer;
 use Behatch\Extension;
 use Behatch\HttpCall\ContextSupportedVoter;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +22,17 @@ final class ExtensionTest extends TestCase
         $this->expectExceptionMessage('needs the Mink extension');
 
         $extension->process($container);
+    }
+
+    public function testTheExceptionStringerIsRegistered(): void
+    {
+        $container = new ContainerBuilder();
+        (new Extension())->load($container, []);
+
+        $definition = $container->getDefinition('behatch.exception_stringer.truncatable');
+
+        $this->assertSame(TruncatableExceptionStringer::class, $definition->getClass());
+        $this->assertTrue($definition->hasTag(ExceptionExtension::STRINGER_TAG));
     }
 
     public function testVotersAreRegisteredByPriority(): void
