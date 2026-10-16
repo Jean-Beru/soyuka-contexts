@@ -237,7 +237,7 @@ class RestContext extends BaseContext
                 continue;
             }
             // CONTENT_* are not prefixed with HTTP_ in PHP when building $_SERVER
-            if ('HTTP_' === substr($name, 0, 5)) {
+            if (str_starts_with($name, 'HTTP_')) {
                 $name = substr($name, 5);
             } elseif (!\in_array($name, ['CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5'], true)) {
                 continue;

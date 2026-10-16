@@ -27,7 +27,7 @@ class Request
 
     public function __call(string $name, array $arguments): mixed
     {
-        return \call_user_func_array([$this->getClient(), $name], $arguments);
+        return $this->getClient()->{$name}(...$arguments);
     }
 
     private function getClient(): Request\BrowserKit

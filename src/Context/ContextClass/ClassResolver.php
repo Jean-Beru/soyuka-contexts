@@ -13,10 +13,6 @@ class ClassResolver implements BaseClassResolver
 
     public function resolveClass(string $contextClass): string
     {
-        $className = preg_replace_callback('/(^\w|:\w)/', static function (array $matches): string {
-            return str_replace(':', '\\', strtoupper($matches[0]));
-        }, $contextClass);
-
-        return $className.'Context';
+        return str_replace(':', '\\', ucwords($contextClass, ':')).'Context';
     }
 }
