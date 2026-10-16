@@ -18,8 +18,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
-          - '8.2'
           - '8.3'
           - '8.4'
           - '8.5'
@@ -44,8 +42,6 @@ jobs:
      strategy:
        matrix:
          php:
-           - '8.1'
-           - '8.2'
            - '8.3'
            - '8.4'
            - '8.5'
@@ -92,8 +88,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
-          - '8.2'
           - '8.3'
           - '8.4'
           - '8.5'
@@ -130,33 +124,22 @@ jobs:
     strategy:
       matrix:
         deps:
-          - 'lowest'
-          - 'behat-3'
-          - 'behat-3-mink-3'
-          - 'behat-4'
+          - 'symfony-7.4'
+          - 'symfony-8'
         profile:
           - 'default'
           - 'selenium'
         include:
-          # browserkit_http exists since mink-extension 2.7.0, and 2.7.1 fixes its Selenium2 capabilities.
-          - deps: 'lowest'
-            php: '8.1'
-            symfony: '5.4.*'
-            require: 'behat/behat:3.20.* friends-of-behat/mink-extension:2.7.1'
-          - deps: 'behat-3'
-            php: '8.3'
-            symfony: '7.4.*'
-            require: 'behat/behat:^3.20'
           # mink-extension 3.0.0-ALPHA.1 breaks the translations of MinkContext,
           # fixed on its master branch (FriendsOfBehat/MinkExtension#65).
-          - deps: 'behat-3-mink-3'
-            php: '8.4'
+          - deps: 'symfony-7.4'
+            php: '8.3'
             symfony: '7.4.*'
-            require: 'behat/behat:^3.32 friends-of-behat/mink-extension:^3.0@dev'
-          - deps: 'behat-4'
+            require: 'friends-of-behat/mink-extension:^3.0@dev'
+          - deps: 'symfony-8'
             php: '8.5'
             symfony: '8.*'
-            require: 'behat/behat:^4.0 friends-of-behat/mink-extension:^3.0@dev'
+            require: 'friends-of-behat/mink-extension:^3.0@dev'
       fail-fast: false
     env:
       DISPLAY: ':99'
