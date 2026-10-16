@@ -3,3 +3,9 @@ parameters:
     paths:
         - src
         - tests
+    ignoreErrors:
+        # instaclick/php-webdriver is only installed with the Selenium2 Mink driver
+        -
+            message: '#^Caught class WebDriver\\Exception\\(StaleElementReference|NoSuchDriver) not found\.$#'
+            identifier: class.notFound
+            reportUnmatched: false
