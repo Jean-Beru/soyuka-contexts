@@ -132,7 +132,7 @@ jobs:
         run: ./bin/phpunit --group missing-dependencies --fail-on-skipped
 
   behat:
-    name: Behat (PHP ${{ matrix.php }}, ${{ matrix.profile }})
+    name: Behat (PHP ${{ matrix.php }}, ${{ matrix.profile }}, ${{ matrix.optional }} optional packages)
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -143,6 +143,13 @@ jobs:
         profile:
           - 'default'
           - 'panther'
+        optional:
+          - 'latest'
+        include:
+          # Lowest versions allowed by the conflicts of composer.json
+          - php: '8.3'
+            profile: 'default'
+            optional: 'lowest'
       fail-fast: false
     timeout-minutes: 20
     steps:
@@ -168,6 +175,9 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Require the lowest optional packages
+        if: matrix.optional == 'lowest'
+        run: composer require --dev --no-update --no-interaction --ansi 'justinrainbow/json-schema:5.3.*' 'symfony/property-access:6.4.*'
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Wait for PHP to start
