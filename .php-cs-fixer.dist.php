@@ -8,9 +8,9 @@ $finder = PhpCsFixer\Finder::create()
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
-        '@PHP7x1Migration' => true,
-        '@PHP7x1Migration:risky' => true,
-        '@PHPUnit6x0Migration:risky' => true,
+        '@PHP8x3Migration' => true,
+        '@PHP8x3Migration:risky' => true,
+        '@PHPUnit11x0Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'align_multiline_comment' => [
