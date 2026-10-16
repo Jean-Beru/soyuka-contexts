@@ -42,6 +42,10 @@ return (new Config())
                             'browser' => 'chrome',
                             'external_base_uri' => $baseUrl,
                         ],
+                        // Set BEHAT_CHROMEDRIVER_PORT when the port 9515 is already used
+                        'manager_options' => [
+                            'port' => (int) (getenv('BEHAT_CHROMEDRIVER_PORT') ?: 9515),
+                        ],
                     ],
                 ],
             ],
