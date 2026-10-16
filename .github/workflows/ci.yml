@@ -5,8 +5,10 @@ on:
     branches:
       - 'main'
       - '4.x'
-  # Temporary: also run on the stacked pull requests of the 4.x branch
   pull_request:
+    branches:
+      - 'main'
+      - '4.x'
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
