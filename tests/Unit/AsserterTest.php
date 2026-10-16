@@ -24,4 +24,17 @@ final class AsserterTest extends TestCase
 
         (new RestContext(new Request($mink)))->theHeaderShouldNotExist('X-Foo');
     }
+
+    public function testNegatedStepPassesOnOtherLogicExceptions(): void
+    {
+        $driver = $this->createStub(DriverInterface::class);
+        $driver->method('getResponseHeaders')->willThrowException(new \InvalidArgumentException());
+
+        $mink = new Mink(['default' => new Session($driver)]);
+        $mink->setDefaultSessionName('default');
+
+        $this->expectNotToPerformAssertions();
+
+        (new RestContext(new Request($mink)))->theHeaderShouldNotExist('X-Foo');
+    }
 }
