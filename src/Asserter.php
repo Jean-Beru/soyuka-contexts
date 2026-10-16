@@ -11,7 +11,7 @@ trait Asserter
     {
         try {
             $callbable();
-        } catch (\LogicException|UnsupportedDriverActionException $e) {
+        } catch (MissingDependencyException|UnsupportedDriverActionException $e) {
             // a missing package or an unsupported driver cannot prove the negation
             throw $e;
         } catch (\Exception $e) {
