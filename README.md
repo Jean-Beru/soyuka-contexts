@@ -10,10 +10,13 @@ Installation
 
 This extension requires:
 
-* PHP 8.1+
-* Behat 3.20+ or 4
-* Mink
-* Mink extension
+* PHP 8.3+
+* Behat 4
+* Symfony 7.4 or 8
+* [Mink extension](https://github.com/FriendsOfBehat/MinkExtension) 3
+
+With Behat 3, use version 3.4, which supports Behat 3.20+ and Behat 4. To upgrade from
+3.x, see [UPGRADE-4.0.md](./UPGRADE-4.0.md).
 
 ### Project dependency
 
@@ -21,44 +24,59 @@ This extension requires:
 2. Require the package with Composer:
 
 ```
-$ composer require --dev soyuka/contexts
+$ composer require --dev soyuka/contexts friends-of-behat/mink-extension:^3.0@alpha \
+    behat/mink-browserkit-driver symfony/http-client symfony/mime symfony/property-access
 ```
 
-3. Activate extension by specifying its class in your `behat.php`:
+`friends-of-behat/mink-extension` 3 is only available as an alpha release for now.
+Composer only reads stability flags from the root `composer.json`, so it must be
+required explicitly as shown above.
+With mink-extension v3.0.0-ALPHA.1, the translated `MinkContext` steps are undefined. See
+the known issue in [UPGRADE-4.0.md](./UPGRADE-4.0.md#known-issue).
+
+3. Activate the Mink and Behatch extensions in your `behat.php` (extensions must be
+   registered by their class name):
 
 ```php
 // behat.php
 use Behat\Config\Config;
 use Behat\Config\Extension;
 use Behat\Config\Profile;
-use Behatch\Extension as BehatchExtension;
+use Behat\Config\Suite;
+use Behat\MinkExtension\Context\MinkContext;
+use Behat\MinkExtension\ServiceContainer\MinkExtension;
 
 return (new Config())
     ->withProfile((new Profile('default'))
-        // ...
-        ->withExtension(new Extension(BehatchExtension::class)));
+        ->withSuite((new Suite('default'))
+            ->withContexts(MinkContext::class, 'behatch:context:rest', 'behatch:context:json'))
+        ->withExtension(new Extension(MinkExtension::class, [
+            'base_url' => 'http://localhost:8000',
+            'sessions' => ['default' => ['browserkit_http' => []]],
+        ]))
+        ->withExtension(new Extension(Behatch\Extension::class)));
 ```
 
-Or in your `behat.yml` (Behat 3 only, Behat 4 reads PHP configuration only):
+The Mink extension is always required. See [Mink
+extension](https://github.com/FriendsOfBehat/MinkExtension) for other sessions and
+drivers.
 
-```yaml
-# behat.yml
-default:
-    # ...
-    extensions:
-        Behatch\Extension: ~
-```
+To test a Symfony application through its kernel, without a web server, use the `symfony`
+Mink session of [friends-of-behat/symfony-extension](https://github.com/FriendsOfBehat/SymfonyExtension)
+(version 2.7+ supports Behat 4). The request steps also work with this session.
 
-### Project bootstraping
+### Optional packages
 
-1. Download the Behatch skeleton with composer:
+Some steps need packages that are not installed by default. The JSON steps throw
+an exception telling which package to install when they are used without it:
 
-```
-$ php composer.phar create-project behatch/skeleton
-```
-
-Browser, json, table and rest step need a mink configuration, see [Mink
-extension](https://github.com/FriendsOfBehat/MinkExtension) for more information.
+* `behat/mink-browserkit-driver`, `symfony/http-client` and `symfony/mime` - to send
+  HTTP requests without a browser (`browserkit_http` Mink session)
+* `symfony/property-access` - JSON node steps (`json` context)
+* `justinrainbow/json-schema` - JSON schema validation steps (`json` context)
+* A JavaScript capable Mink driver (e.g. `robertfausk/behat-panther-extension`, which also
+  needs `phpunit/phpunit`) - steps
+  that need a real browser (`browser` and `debug` contexts)
 
 Usage
 -----
@@ -66,43 +84,25 @@ Usage
 In `behat.php`, enable desired contexts:
 
 ```php
-// behat.php
-use Behat\Config\Config;
-use Behat\Config\Profile;
 use Behat\Config\Suite;
 
-return (new Config())
-    ->withProfile((new Profile('default'))
-        ->withSuite((new Suite('default'))
-            ->addContext('behatch:context:browser')
-            ->addContext('behatch:context:debug')
-            ->addContext('behatch:context:system')
-            ->addContext('behatch:context:json')
-            ->addContext('behatch:context:table')
-            ->addContext('behatch:context:rest')
-            ->addContext('behatch:context:xml')));
-```
-
-Or in `behat.yml`:
-
-```yaml
-default:
-    suites:
-        default:
-            contexts:
-                - behatch:context:browser
-                - behatch:context:debug
-                - behatch:context:system
-                - behatch:context:json
-                - behatch:context:table
-                - behatch:context:rest
-                - behatch:context:xml
+(new Suite('default'))
+    ->withContexts(
+        'behatch:context:browser',
+        'behatch:context:debug',
+        'behatch:context:system',
+        'behatch:context:json',
+        'behatch:context:table',
+        'behatch:context:rest',
+        'behatch:context:xml',
+    );
 ```
 
 ### Examples
 
 This project is self-tested, you can explore the [features
-directory](./tests/features) to find some examples.
+directory](./tests/features) to find some examples and [behat.dist.php](./behat.dist.php)
+for a complete configuration.
 
 Configuration
 -------------
@@ -125,16 +125,5 @@ For example, if you want to change default directory to screenshots - you can do
 
 ```php
 (new Suite('default'))
-    ->addContext('behatch:context:debug', [
-        'screenshotDir' => 'var',
-    ])
-```
-
-```yaml
-default:
-    suites:
-        default:
-            contexts:
-                - behatch:context:debug:
-                    screenshotDir: "var"
+    ->addContext('behatch:context:debug', ['screenshotDir' => 'var']);
 ```
