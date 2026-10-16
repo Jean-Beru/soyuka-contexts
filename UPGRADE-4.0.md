@@ -98,7 +98,9 @@ Update the classes that extend or implement them:
   `string`;
 * `SystemContext::getTranslationResources()` returns an `array`;
 * classes that use the `Behatch\Html` trait must declare
-  `getSession(?string $name = null): Session`, as `RawMinkContext` does.
+  `getSession(?string $name = null): Session`, as `RawMinkContext` does;
+* `Asserter::not()`, `assert()`, `assertContains()` and `assertNotContains()` take an
+  optional `?string $shortMessage` last argument. Add it to the methods that you override.
 
 Native types
 ------------
@@ -149,6 +151,9 @@ Behavior fixes
   returning `false`.
 * `Xml\Dom` throws a `\DOMException` instead of a `\ValueError` on empty content.
 * `I put a breakpoint` reads one line, and does not loop forever when the input is closed.
+* Without `-v`, the failure message of `the JSON node :node should (not) contain :text`
+  shows only the first 200 characters of a long node value. Run Behat with `-v` to see
+  the full value.
 * Negated steps (`... should not ...`) fail instead of passing when the driver cannot answer
   them, e.g. `the :element element should not be visible` on a session without JavaScript
   or `the header :name should not exist` on a browser session. Run these steps with a driver
