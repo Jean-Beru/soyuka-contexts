@@ -141,10 +141,14 @@ jobs:
         run: ./bin/phpunit --group missing-dependencies --fail-on-skipped
 
   behat:
-    name: Behat (${{ matrix.profile }})
+    name: Behat (PHP ${{ matrix.php }}, ${{ matrix.profile }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # PHP 8.3 installs Symfony 7.4, PHP 8.5 installs Symfony 8
+        php:
+          - '8.3'
+          - '8.5'
         profile:
           - 'default'
           - 'panther'
@@ -155,7 +159,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: ${{ matrix.php }}
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
