@@ -11,6 +11,7 @@
         "behat/mink": "^1.11",
         "friends-of-behat/mink-extension": "^3.0@alpha",
         "symfony/config": "^7.4 || ^8.0",
+        "symfony/console": "^7.4 || ^8.0",
         "symfony/dependency-injection": "^7.4 || ^8.0",
         "symfony/event-dispatcher": "^7.4 || ^8.0",
         "symfony/yaml": "^7.4 || ^8.0"

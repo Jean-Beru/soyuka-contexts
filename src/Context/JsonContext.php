@@ -215,11 +215,13 @@ class JsonContext extends BaseContext
         $json = $this->getJson();
 
         $actual = (string) $this->inspector->evaluate($json, $node);
+        $message = "The node '%s' should contain '%s', but it is '%s'.";
 
         $this->assertContains(
             $text,
             $actual,
-            \sprintf("The node '%s' should contain '%s', but it is '%s'.", $node, $text, $actual)
+            \sprintf($message, $node, $text, $actual),
+            \sprintf($message, $node, $text, self::truncate($actual))
         );
     }
 
@@ -243,11 +245,13 @@ class JsonContext extends BaseContext
         $json = $this->getJson();
 
         $actual = (string) $this->inspector->evaluate($json, $node);
+        $message = "The node '%s' should not contain '%s', but it is '%s'.";
 
         $this->assertNotContains(
             $text,
             $actual,
-            \sprintf("The node '%s' should not contain '%s', but it is '%s'.", $node, $text, $actual)
+            \sprintf($message, $node, $text, $actual),
+            \sprintf($message, $node, $text, self::truncate($actual))
         );
     }
 
@@ -399,5 +403,13 @@ class JsonContext extends BaseContext
     public static function reespaceSpecialGherkinValue(string $value): string
     {
         return str_replace('\\n', "\n", $value);
+    }
+
+    /**
+     * Cuts a long node value for the normal output. The full value is printed with -v.
+     */
+    private static function truncate(string $value): string
+    {
+        return mb_strimwidth($value, 0, 200, '...');
     }
 }
