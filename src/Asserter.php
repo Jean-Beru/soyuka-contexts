@@ -3,6 +3,7 @@
 namespace Behatch;
 
 use Behat\Mink\Exception\ExpectationException;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 
 trait Asserter
 {
@@ -10,7 +11,8 @@ trait Asserter
     {
         try {
             $callbable();
-        } catch (MissingDependencyException $e) {
+        } catch (MissingDependencyException|UnsupportedDriverActionException $e) {
+            // a missing package or an unsupported driver cannot prove the negation
             throw $e;
         } catch (\Exception $e) {
             return;

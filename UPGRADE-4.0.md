@@ -149,6 +149,10 @@ Behavior fixes
   returning `false`.
 * `Xml\Dom` throws a `\DOMException` instead of a `\ValueError` on empty content.
 * `I put a breakpoint` reads one line, and does not loop forever when the input is closed.
+* Negated steps (`... should not ...`) fail instead of passing when the driver cannot answer
+  them, e.g. `the :element element should not be visible` on a session without JavaScript
+  or `the header :name should not exist` on a browser session. Run these steps with a driver
+  that supports them: a JavaScript driver for visibility, a BrowserKit session for headers.
 
 Known issue
 -----------
