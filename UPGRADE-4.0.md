@@ -70,8 +70,9 @@ removes them when no other package requires them. Install the ones you need with
   (`symfony/http-foundation` is only used with kernel browser sessions, which already
   install it).
 
-When installed, `justinrainbow/json-schema` 6.0+ and `symfony/property-access` 7.4+ are
-required (enforced by `conflict`).
+Steps using a missing package throw a `Behatch\MissingDependencyException`. When installed,
+`justinrainbow/json-schema` 5.3+ and `symfony/property-access` 6.4+ are required
+(enforced by `conflict`).
 
 Removed steps and methods
 -------------------------

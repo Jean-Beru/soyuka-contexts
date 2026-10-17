@@ -40,8 +40,8 @@
     },
 
     "conflict": {
-        "justinrainbow/json-schema": "<6.0",
-        "symfony/property-access": "<7.4"
+        "justinrainbow/json-schema": "<5.3",
+        "symfony/property-access": "<6.4"
     },
 
     "autoload": {
