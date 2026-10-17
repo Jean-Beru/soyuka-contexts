@@ -21,9 +21,9 @@ class SystemContext implements Context
         $this->root = $root;
     }
 
-    public static function getTranslationResources()
+    public static function getTranslationResources(): array
     {
-        return glob(__DIR__.'/../../i18n/*.xliff');
+        return glob(__DIR__.'/../../i18n/*.xliff') ?: [];
     }
 
     /**
@@ -168,7 +168,6 @@ class SystemContext implements Context
     }
 
     #[Given('(I )create the file :filename containing:')]
-    #[Given('(I )create the file :filename contening:')]
     public function iCreateTheFileContaining($filename, PyStringNode $string): void
     {
         if (!is_file($filename)) {

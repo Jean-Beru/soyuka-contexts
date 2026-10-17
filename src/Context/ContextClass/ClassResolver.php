@@ -6,12 +6,12 @@ use Behat\Behat\Context\ContextClass\ClassResolver as BaseClassResolver;
 
 class ClassResolver implements BaseClassResolver
 {
-    public function supportsClass($contextClass): bool
+    public function supportsClass(string $contextClass): bool
     {
         return str_starts_with($contextClass, 'behatch:context:');
     }
 
-    public function resolveClass($contextClass): string
+    public function resolveClass(string $contextClass): string
     {
         $className = preg_replace_callback('/(^\w|:\w)/', static function ($matches) {
             return str_replace(':', '\\', strtoupper($matches[0]));

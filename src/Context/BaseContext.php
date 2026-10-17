@@ -16,14 +16,10 @@ abstract class BaseContext extends RawMinkContext implements TranslatableContext
         return glob(__DIR__.'/../../i18n/*.xliff') ?: [];
     }
 
-    // en
-    #[Transform('/^(0|[1-9]\d*)(?:st|nd|rd|th)?$/')]
-    // fr
-    #[Transform('/^(0|[1-9]\d*)(?:ier|er|e|ème)?$/')]
-    // pt
-    #[Transform('/^(0|[1-9]\d*)º?$/')]
-    // ru
-    #[Transform('/^(0|[1-9]\d*)(?:ой|ий|ый|ей|й)?$/')]
+    #[Transform('/^(0|[1-9]\d*)(?:st|nd|rd|th)?$/')] // en
+    #[Transform('/^(0|[1-9]\d*)(?:ier|er|e|ème)?$/')] // fr
+    #[Transform('/^(0|[1-9]\d*)º?$/')] // pt
+    #[Transform('/^(0|[1-9]\d*)(?:ой|ий|ый|ей|й)?$/')] // ru
     public function castToInt($count)
     {
         if ((int) $count < \PHP_INT_MAX) {

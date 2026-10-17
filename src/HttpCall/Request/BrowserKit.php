@@ -2,10 +2,11 @@
 
 namespace Behatch\HttpCall\Request;
 
+use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Mink;
 use Symfony\Component\BrowserKit\AbstractBrowser;
-use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
 class BrowserKit
 {
@@ -42,15 +43,7 @@ class BrowserKit
 
     protected function getRequest()
     {
-        $client = $this->mink->getSession()->getDriver()->getClient();
-        // BC layer for BrowserKit 2.2.x and older
-        if (method_exists($client, 'getInternalRequest')) {
-            $request = $client->getInternalRequest();
-        } else {
-            $request = $client->getRequest();
-        }
-
-        return $request;
+        return $this->getClient()->getInternalRequest();
     }
 
     public function getContent()
@@ -58,16 +51,16 @@ class BrowserKit
         return $this->mink->getSession()->getPage()->getContent();
     }
 
-    public function send($method, $url, $parameters = [], $files = [], $content = null, $headers = [])
+    public function send($method, $url, $parameters = [], $files = [], ?string $content = null, $headers = [])
     {
-        $client = $this->mink->getSession()->getDriver()->getClient();
+        $client = $this->getClient();
 
-        foreach ($files as $originalName => &$file) {
+        foreach ($files as &$file) {
             if (\is_string($file)) {
-                // HttpBrowser only reads files in the $_FILES format and silently drops UploadedFile instances
-                $file = $client instanceof HttpBrowser
-                    ? ['tmp_name' => $file, 'name' => basename($file)]
-                    : new UploadedFile($file, (string) $originalName);
+                // HttpKernelBrowser only keeps UploadedFile instances, HttpBrowser only reads arrays
+                $file = $client instanceof HttpKernelBrowser
+                    ? new UploadedFile($file, basename($file), null, null, true)
+                    : ['tmp_name' => $file, 'name' => basename($file)];
             }
         }
 
@@ -87,29 +80,17 @@ class BrowserKit
 
     public function setHttpHeader($name, $value): void
     {
-        $client = $this->mink->getSession()->getDriver()->getClient();
-        if (method_exists($client, 'setHeader')) {
-            /*
-             * @var \Goutte\Client $client
-             */
-            $client->setHeader($name, $value);
-        } else {
-            /**
-             * @var HttpBrowser $client
-             */
+        /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
+        $contentHeaders = ['CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true];
+        $name = str_replace('-', '_', strtoupper($name));
 
-            /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
-            $contentHeaders = ['CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true];
-            $name = str_replace('-', '_', strtoupper($name));
-
-            // CONTENT_* are not prefixed with HTTP_ in PHP when building $_SERVER
-            if (!isset($contentHeaders[$name])) {
-                $name = 'HTTP_'.$name;
-            }
-            /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
-
-            $client->setServerParameter($name, $value);
+        // CONTENT_* are not prefixed with HTTP_ in PHP when building $_SERVER
+        if (!isset($contentHeaders[$name])) {
+            $name = 'HTTP_'.$name;
         }
+        /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
+
+        $this->getClient()->setServerParameter($name, $value);
     }
 
     public function getHttpHeaders()
@@ -146,13 +127,17 @@ class BrowserKit
 
     protected function resetHttpHeaders(): void
     {
-        /** @var AbstractBrowser $client */
-        $client = $this->mink->getSession()->getDriver()->getClient();
+        $this->getClient()->setServerParameters([]);
+    }
 
-        $client->setServerParameters([]);
-        // Goutte keeps the headers given to setHeader() until restart()
-        if (method_exists($client, 'setHeader')) {
-            $client->restart();
+    private function getClient(): AbstractBrowser
+    {
+        $driver = $this->mink->getSession()->getDriver();
+
+        if (!$driver instanceof BrowserKitDriver) {
+            throw new \LogicException(\sprintf('Sending HTTP requests needs a BrowserKit Mink session such as "browserkit_http", the current session uses "%s".', $driver::class));
         }
+
+        return $driver->getClient();
     }
 }
