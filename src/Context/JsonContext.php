@@ -15,12 +15,9 @@ class JsonContext extends BaseContext
 {
     protected JsonInspector $inspector;
 
-    protected HttpCallResultPool $httpCallResultPool;
-
-    public function __construct(HttpCallResultPool $httpCallResultPool, string $evaluationMode = 'javascript')
+    public function __construct(protected HttpCallResultPool $httpCallResultPool, string $evaluationMode = 'javascript')
     {
         $this->inspector = new JsonInspector($evaluationMode);
-        $this->httpCallResultPool = $httpCallResultPool;
     }
 
     /**
@@ -291,9 +288,7 @@ class JsonContext extends BaseContext
     #[Then('the JSON node :name should not exist')]
     public function theJsonNodeShouldNotExist(string $name): void
     {
-        $this->not(function () use ($name) {
-            return $this->theJsonNodeShouldExist($name);
-        }, "The node '$name' exists.");
+        $this->not(fn () => $this->theJsonNodeShouldExist($name), "The node '$name' exists.");
     }
 
     #[Then('the JSON should be valid according to this schema:')]

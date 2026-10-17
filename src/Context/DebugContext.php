@@ -14,11 +14,8 @@ use Behat\Step\When;
 
 class DebugContext extends BaseContext
 {
-    private readonly string $screenshotDir;
-
-    public function __construct(string $screenshotDir = '.')
+    public function __construct(private readonly string $screenshotDir = '.')
     {
-        $this->screenshotDir = $screenshotDir;
     }
 
     /**
@@ -87,9 +84,7 @@ class DebugContext extends BaseContext
         $scenarios = $scope->getFeature()->getScenarios();
         foreach ($scenarios as $scenario) {
             $stepLinesInScenario = array_map(
-                static function (StepNode $step) {
-                    return $step->getLine();
-                },
+                static fn (StepNode $step) => $step->getLine(),
                 $scenario->getSteps()
             );
             if (\in_array($scope->getStep()->getLine(), $stepLinesInScenario, true)) {
@@ -107,9 +102,7 @@ class DebugContext extends BaseContext
             return false;
         }
         $stepLinesInBackground = array_map(
-            static function (StepNode $step) {
-                return $step->getLine();
-            },
+            static fn (StepNode $step) => $step->getLine(),
             $background->getSteps()
         );
         if (\in_array($scope->getStep()->getLine(), $stepLinesInBackground, true)) {

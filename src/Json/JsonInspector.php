@@ -7,13 +7,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class JsonInspector
 {
-    private readonly string $evaluationMode;
-
     private ?PropertyAccessor $accessor = null;
 
-    public function __construct(string $evaluationMode)
+    public function __construct(private readonly string $evaluationMode)
     {
-        $this->evaluationMode = $evaluationMode;
     }
 
     public function evaluate(Json $json, string $expression): mixed
@@ -46,8 +43,7 @@ class JsonInspector
 
         $validator = new \JsonSchema\Validator();
 
-        $resolver = new \JsonSchema\SchemaStorage(new \JsonSchema\Uri\UriRetriever(), new \JsonSchema\Uri\UriResolver());
-        $schema->resolve($resolver);
+        $schema->resolve(new \JsonSchema\SchemaStorage());
 
         return $schema->validate($json, $validator);
     }

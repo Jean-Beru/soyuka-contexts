@@ -141,6 +141,8 @@ Behavior fixes
 --------------
 
 * `I execute :command` resets the output of the previous command instead of appending to it.
+* The `system` context steps are translated when no other Behatch context is enabled in the
+  suite.
 * Numeric step arguments turned into integers by `BaseContext::castToInt()` are compared as
   strings again by `the JSON node :node should be equal to the string :expected` and
   `the XML attribute ... should not be equal to :text`.

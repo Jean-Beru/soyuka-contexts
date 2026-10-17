@@ -17,13 +17,11 @@ use WebDriver\Exception\StaleElementReference;
 
 class BrowserContext extends BaseContext
 {
-    private readonly float $timeout;
     private string $dateFormat = 'dmYHi';
     private int $timerStartedAt;
 
-    public function __construct(float $timeout = 1)
+    public function __construct(private readonly float $timeout = 1)
     {
-        $this->timeout = $timeout;
     }
 
     #[AfterScenario]
@@ -396,18 +394,13 @@ class BrowserContext extends BaseContext
     {
         $elapsed = time() - $this->timerStartedAt;
 
-        switch ($comparison) {
-            case 'less':
-                $this->assertTrue($elapsed < $expected, "Elapsed time '$elapsed' is not less than '$expected' seconds.");
-                break;
-            case 'more':
-                $this->assertTrue($elapsed > $expected, "Elapsed time '$elapsed' is not more than '$expected' seconds.");
-                break;
-            case 'equal':
-                $this->assertTrue($elapsed === $expected, "Elapsed time '$elapsed' is not '$expected' seconds.");
-                break;
-            default:
-                throw new PendingException("Unknown comparison '$comparison'. Use 'less', 'more' or 'equal'");
-        }
+        [$passed, $message] = match ($comparison) {
+            'less' => [$elapsed < $expected, "Elapsed time '$elapsed' is not less than '$expected' seconds."],
+            'more' => [$elapsed > $expected, "Elapsed time '$elapsed' is not more than '$expected' seconds."],
+            'equal' => [$elapsed === $expected, "Elapsed time '$elapsed' is not '$expected' seconds."],
+            default => throw new PendingException("Unknown comparison '$comparison'. Use 'less', 'more' or 'equal'"),
+        };
+
+        $this->assertTrue($passed, $message);
     }
 }

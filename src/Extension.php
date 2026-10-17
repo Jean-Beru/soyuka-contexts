@@ -6,6 +6,7 @@ use Behat\Behat\Context\ServiceContainer\ContextExtension;
 use Behat\Testwork\Exception\ServiceContainer\ExceptionExtension;
 use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+use Behatch\Context\ContextClass\ClassResolver;
 use Behatch\Exception\TruncatableExceptionStringer;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
@@ -51,7 +52,7 @@ class Extension implements ExtensionInterface
 
     private function loadClassResolver(ContainerBuilder $container): void
     {
-        $definition = new Definition('Behatch\Context\ContextClass\ClassResolver');
+        $definition = new Definition(ClassResolver::class);
         $definition->addTag(ContextExtension::CLASS_RESOLVER_TAG);
         $container->setDefinition('behatch.class_resolver', $definition);
     }
