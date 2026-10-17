@@ -4,5 +4,5 @@ namespace Behatch\HttpCall;
 
 interface FilterableHttpCallResult
 {
-    public function filter(HttpCallResult $httpCallResult);
+    public function filter(HttpCallResult $httpCallResult): mixed;
 }

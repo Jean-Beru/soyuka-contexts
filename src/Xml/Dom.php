@@ -4,10 +4,14 @@ namespace Behatch\Xml;
 
 class Dom implements \Stringable
 {
-    private $dom;
+    private readonly \DOMDocument $dom;
 
-    public function __construct($content)
+    public function __construct(string $content)
     {
+        if ('' === $content) {
+            throw new \DOMException('The XML content is empty');
+        }
+
         $this->dom = new \DOMDocument();
         $this->dom->strictErrorChecking = false;
         $this->dom->validateOnParse = false;
@@ -29,13 +33,13 @@ class Dom implements \Stringable
         $this->throwError();
     }
 
-    public function validateXsd($xsd): void
+    public function validateXsd(string $xsd): void
     {
         $this->dom->schemaValidateSource($xsd);
         $this->throwError();
     }
 
-    public function validateNg($ng): void
+    public function validateNg(string $ng): void
     {
         try {
             $this->dom->relaxNGValidateSource($ng);
@@ -45,7 +49,7 @@ class Dom implements \Stringable
         }
     }
 
-    public function xpath($element)
+    public function xpath(string $element): \DOMNodeList
     {
         $xpath = new \DOMXPath($this->dom);
         $this->registerNamespace($xpath);
@@ -71,7 +75,7 @@ class Dom implements \Stringable
     /**
      * "fix" queries to the default namespace if any namespaces are defined.
      */
-    private function fixNamespace($element)
+    private function fixNamespace(string $element): string
     {
         $namespaces = $this->getNamespaces();
 
@@ -85,7 +89,7 @@ class Dom implements \Stringable
         return $element;
     }
 
-    private function hasDefaultNamespace()
+    private function hasDefaultNamespace(): bool
     {
         $defaultNamespaceUri = $this->dom->lookupNamespaceURI(null);
         $defaultNamespacePrefix = $defaultNamespaceUri ? $this->dom->lookupPrefix($defaultNamespaceUri) : null;
@@ -93,7 +97,7 @@ class Dom implements \Stringable
         return empty($defaultNamespacePrefix) && !empty($defaultNamespaceUri);
     }
 
-    public function getNamespaces()
+    public function getNamespaces(): array
     {
         $xml = simplexml_import_dom($this->dom);
 

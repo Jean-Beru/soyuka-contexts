@@ -100,6 +100,56 @@ Update the classes that extend or implement them:
 * classes that use the `Behatch\Html` trait must declare
   `getSession(?string $name = null): Session`, as `RawMinkContext` does.
 
+Native types
+------------
+
+Every property, argument and return value of the library now has a native type. Overriding
+methods may keep untyped arguments, but must declare the new return types, and redeclared
+properties must use the same type:
+
+* custom context voters: `ContextSupportedVoter::vote(): bool` and
+  `FilterableHttpCallResult::filter(): mixed`;
+* steps returning a value: `RestContext::iSendARequestTo()`,
+  `iSendARequestToWithParameters()` and `iSendARequestToWithBody()` return a
+  `DocumentElement`, `RestContext::theHeaderShouldExist()` and
+  `XmlContext::theXmlAttributeShouldExist()` a `string`,
+  `XmlContext::theXmlElementShouldExist()` a `\DOMNodeList` and
+  `JsonContext::theJsonNodeShouldExist()` is `mixed`;
+* `BrowserContext::iAmOnUrlComposedBy()`, `iFillInWithTheCurrentDate()` and
+  `iFillInWithTheCurrentDateAndModifier()` return `void` (they always returned `null`);
+* helpers: `BaseContext::castToInt(): int|string`, `BaseContext::getMinkContext(): MinkContext`,
+  `JsonContext::getJson(): Json`, `JsonContext::reespaceSpecialGherkinValue(string)`,
+  `Html::countElements(): int`,
+  `Html::findElement(): NodeElement`, `HttpCallListener::afterStep(): void`, and every method
+  of `Json`, `JsonSchema`, `JsonInspector`, `Xml\Dom`, `HttpCallResult`,
+  `HttpCallResultPool`, `Request` and `Request\BrowserKit`;
+* protected properties: `RestContext::$request`, `JsonContext::$inspector`,
+  `JsonContext::$httpCallResultPool`, `Json::$content` and `Request\BrowserKit::$mink`;
+* `Asserter` methods take typed arguments: `assertContains()` and `assertNotContains()`
+  take strings, `assertCount()` an `int` and an `array`, `assertArrayHasKey()` and
+  `assertArrayNotHasKey()` an `int|string` key and an `array|\ArrayAccess`, and messages
+  are `?string`. Cast the values before you pass them;
+* `Asserter::assert()`, `assertTrue()` and `assertFalse()` take a `bool`: `assertTrue()` now
+  fails on falsy values such as `0` or `''` (only `false` failed before) and `null` is a
+  `TypeError`. Assertion messages are strings;
+* context parameters: `BrowserContext` `timeout` is a `float`, `DebugContext`
+  `screenshotDir`, `SystemContext` `root` and `JsonContext` `evaluationMode` are strings.
+
+Behavior fixes
+--------------
+
+* `I execute :command` resets the output of the previous command instead of appending to it.
+* Numeric step arguments turned into integers by `BaseContext::castToInt()` are compared as
+  strings again by `the JSON node :node should be equal to the string :expected` and
+  `the XML attribute ... should not be equal to :text`.
+* `the XML attribute :attribute on element :element should exist` accepts the `"0"` value.
+* `the JSON node :node should match :pattern` fails on an invalid pattern.
+* `the response should not be in XML` passes on an empty response.
+* `Json::encode()` throws a `\JsonException` when it cannot encode the content, instead of
+  returning `false`.
+* `Xml\Dom` throws a `\DOMException` instead of a `\ValueError` on empty content.
+* `I put a breakpoint` reads one line, and does not loop forever when the input is closed.
+
 Known issue
 -----------
 

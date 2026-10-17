@@ -4,19 +4,19 @@ namespace Behatch\HttpCall;
 
 class HttpCallResult
 {
-    private $value;
+    private mixed $value;
 
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }
 
-    public function update($value): void
+    public function update(mixed $value): void
     {
         $this->value = $value;
     }
 
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

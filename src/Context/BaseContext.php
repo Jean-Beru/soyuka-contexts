@@ -3,6 +3,7 @@
 namespace Behatch\Context;
 
 use Behat\Behat\Context\TranslatableContext;
+use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Transformation\Transform;
 
@@ -20,7 +21,7 @@ abstract class BaseContext extends RawMinkContext implements TranslatableContext
     #[Transform('/^(0|[1-9]\d*)(?:ier|er|e|ème)?$/')] // fr
     #[Transform('/^(0|[1-9]\d*)º?$/')] // pt
     #[Transform('/^(0|[1-9]\d*)(?:ой|ий|ый|ей|й)?$/')] // ru
-    public function castToInt($count)
+    public function castToInt(string $count): int|string
     {
         if ((int) $count < \PHP_INT_MAX) {
             return (int) $count;
@@ -29,9 +30,9 @@ abstract class BaseContext extends RawMinkContext implements TranslatableContext
         return $count;
     }
 
-    protected function getMinkContext()
+    protected function getMinkContext(): MinkContext
     {
-        $context = new \Behat\MinkExtension\Context\MinkContext();
+        $context = new MinkContext();
         $context->setMink($this->getMink());
         $context->setMinkParameters($this->getMinkParameters());
 

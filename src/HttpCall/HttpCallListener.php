@@ -10,11 +10,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class HttpCallListener implements EventSubscriberInterface
 {
-    private $contextSupportedVoter;
+    private readonly ContextSupportedVoter $contextSupportedVoter;
 
-    private $httpCallResultPool;
+    private readonly HttpCallResultPool $httpCallResultPool;
 
-    private $mink;
+    private readonly Mink $mink;
 
     public function __construct(ContextSupportedVoter $contextSupportedVoter, HttpCallResultPool $httpCallResultPool, Mink $mink)
     {
@@ -30,7 +30,7 @@ class HttpCallListener implements EventSubscriberInterface
         ];
     }
 
-    public function afterStep(AfterStepTested $event)
+    public function afterStep(AfterStepTested $event): void
     {
         $testResult = $event->getTestResult();
 
@@ -45,7 +45,7 @@ class HttpCallListener implements EventSubscriberInterface
         if ($this->contextSupportedVoter->vote($httpCallResult)) {
             $this->httpCallResultPool->store($httpCallResult);
 
-            return true;
+            return;
         }
 
         // For now to avoid modification on MinkContext
