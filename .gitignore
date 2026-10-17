@@ -1,8 +1,10 @@
-atoum.xunit.xml
-behat.yml
+.phpunit.cache
+behat.php
 behatch_contexts.phar
 bin/
 composer.lock
 composer.phar
 vendor
 .php-cs-fixer.cache
+/index.png
+/fail_*.png

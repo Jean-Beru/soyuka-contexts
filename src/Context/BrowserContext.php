@@ -12,6 +12,7 @@ use Behat\Mink\Exception\ResponseTextException;
 use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Step\When;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use WebDriver\Exception\StaleElementReference;
 
 class BrowserContext extends BaseContext
@@ -196,7 +197,7 @@ class BrowserContext extends BaseContext
                 return;
             } catch (ExpectationException $e) {
                 /* Intentionally leave blank */
-            } catch (StaleElementReference $e) {
+            } catch (StaleElementReferenceException|StaleElementReference $e) {
                 // assume page reloaded whilst we were still waiting
             }
         } while (time() - $startTime < $count);
